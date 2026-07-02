@@ -1,0 +1,2 @@
+Configure the SSH server to DENY root login (PermitRootLogin no) and reload the
+sshd service so the change takes effect.

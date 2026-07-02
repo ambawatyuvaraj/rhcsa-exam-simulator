@@ -1,0 +1,2 @@
+Create a {{SZ}} MiB swap FILE at /swapfile (not a partition), enable it now, and
+make it activate automatically at boot via /etc/fstab.

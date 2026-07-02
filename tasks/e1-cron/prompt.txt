@@ -1,0 +1,2 @@
+Create a cron job for the user harry that runs the command /bin/echo hello
+every day at 12:30 PM.

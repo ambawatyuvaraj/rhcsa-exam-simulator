@@ -1,0 +1,5 @@
+The file /opt/dups.txt contains repeated lines.
+
+Produce a count of how many times each distinct line occurs and write it to
+/root/{{OUT}}, exactly as the pipeline `sort | uniq -c` produces it (each line
+prefixed by its count).

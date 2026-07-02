@@ -1,0 +1,2 @@
+Count how many lines of /etc/passwd contain the string `{{PAT}}` and write that
+number (the integer only, nothing else) to the file /root/{{OUT}}.

@@ -1,0 +1,1 @@
+Configure sudo so that the user {{U}} may run ONLY the command /usr/bin/systemctl as root, WITHOUT being prompted for a password. The user must not gain any other sudo privileges.

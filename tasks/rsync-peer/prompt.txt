@@ -1,0 +1,10 @@
+This system is node2.example.com. Use rsync over SSH to copy a directory to
+the peer node (node1.example.com), preserving its contents.
+
+  * Source (on this node):  /opt/datasrc
+  * Destination:  deploy@node1.example.com:/home/deploy/
+
+Set up passwordless SSH to deploy@node1 first (the "key-based SSH to the peer"
+task) so rsync does not prompt for a password.
+
+After the transfer, /home/deploy/datasrc/file1 must exist on the peer.

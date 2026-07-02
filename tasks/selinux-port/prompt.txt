@@ -1,0 +1,10 @@
+A web server (httpd) on this system is configured to listen on the
+non-standard port 82, but it is failing to serve content. Diagnose and fix
+the problem so that:
+
+  * The web server serves the existing content located in /var/www/html
+    (do NOT modify or remove the existing files there).
+  * The web server serves its content on port 82.
+  * The web server starts automatically at boot.
+
+The content must be reachable, for example:  curl http://localhost:82

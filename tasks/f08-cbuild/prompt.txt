@@ -1,0 +1,8 @@
+create a container
+
+Using the Containerfile provided in /home/walhalla/build, build a container
+image and name it monitor. Do this as the user walhalla.
+
+(Do not make any changes to the Containerfile.)
+
+Log in as walhalla over SSH:  ssh walhalla@node1.example.com  (password: redhat)

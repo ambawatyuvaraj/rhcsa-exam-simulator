@@ -1,0 +1,13 @@
+Create the shared directory /home/managers with the following
+characteristics:
+
+  * The group ownership of /home/managers is sysmgrs.
+
+  * The directory is readable, writable, and accessible (i.e. searchable)
+    by members of the sysmgrs group, but NO other (non-root) user may
+    have any access to it.
+
+  * Any file created within /home/managers automatically has its group
+    ownership set to the sysmgrs group.
+
+(The sysmgrs group already exists on this system.)

@@ -1,0 +1,2 @@
+Set the GRUB boot menu timeout to {{N}} seconds and regenerate the bootloader
+configuration so it takes effect.

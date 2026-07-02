@@ -1,0 +1,6 @@
+An NFS server exports per-name directories under localhost:/exports/homes
+(e.g. localhost:/exports/homes/u1).
+
+Configure autofs with an INDIRECT WILDCARD map so that accessing
+/autohomes/<name> automatically mounts localhost:/exports/homes/<name>.
+Enable and start autofs.

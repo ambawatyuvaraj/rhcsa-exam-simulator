@@ -1,0 +1,4 @@
+locate commented or uncommented lines
+
+locate all uncommented lines in the file /etc/sudoers and copy all these
+lines, in the same order, to the /root/list file.

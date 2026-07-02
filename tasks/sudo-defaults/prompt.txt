@@ -1,0 +1,3 @@
+Configure sudo so that the authentication timestamp timeout is {{T}} minutes
+(set the sudoers Defaults option timestamp_timeout={{T}}). The sudoers
+configuration must remain syntactically valid.

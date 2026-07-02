@@ -1,0 +1,2 @@
+Prevent the user {{U}} from using the `at` command to schedule jobs. Use the
+/etc/at.deny mechanism so that {{U}} is denied while other users keep access.

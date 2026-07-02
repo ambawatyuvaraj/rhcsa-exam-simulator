@@ -1,0 +1,5 @@
+An NFS export is available at localhost:/exports/direct.
+
+Configure autofs with a DIRECT map so that /mnt/{{MP}} automatically mounts
+localhost:/exports/direct on access. Enable and start autofs so the mount
+triggers when /mnt/{{MP}} is accessed.

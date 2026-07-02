@@ -1,0 +1,9 @@
+Create a systemd timer that runs a oneshot service every 15 minutes:
+
+  - A service unit {{NAME}}.service of Type=oneshot that runs:
+        /usr/bin/logger tmr
+  - A timer unit {{NAME}}.timer that triggers it every 15 minutes
+    (OnUnitActiveSec=15min or OnCalendar).
+
+Place the units under /etc/systemd/system, then enable the timer so it is
+active and starts at boot.

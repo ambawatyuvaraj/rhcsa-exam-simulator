@@ -1,0 +1,2 @@
+Mount a tmpfs (RAM-backed) filesystem of size {{SZ}}M persistently at
+/mnt/{{MP}} (via /etc/fstab, so it is mounted at every boot).

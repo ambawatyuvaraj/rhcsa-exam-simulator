@@ -1,0 +1,16 @@
+# RHCSA simulator — Exam set 02 (storage task: swap-partition)
+network-config
+repo-config
+selinux-port
+users-groups
+user-uid
+chrony-ntp
+autofs-nfs
+grep-string
+tar-archive
+script-finder
+container-service
+acl-permissions
+swap-partition
+boot-target
+root-password

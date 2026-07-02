@@ -1,0 +1,1 @@
+Create a user named {{U}} whose home directory is {{HOMEDIR}} (the directory must exist and be the user's home).

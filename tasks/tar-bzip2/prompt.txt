@@ -1,0 +1,3 @@
+Create a bzip2-compressed tar archive of the directory /opt/bz, saving it as
+/root/{{ARC}}.tar.bz2. The archive must contain the contents of /opt/bz and be
+compressed with bzip2.

@@ -1,0 +1,2 @@
+Add the kernel boot argument {{ARG}} persistently to ALL installed kernels so
+that it is applied on every boot.

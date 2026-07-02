@@ -1,0 +1,4 @@
+A directory of data lives at /srv/{{SRC}}.
+
+Create a PERSISTENT bind mount that makes the contents of /srv/{{SRC}} also
+appear at /mnt/{{MP}} (via /etc/fstab, so it survives a reboot).

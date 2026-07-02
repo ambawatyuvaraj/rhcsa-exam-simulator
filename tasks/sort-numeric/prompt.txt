@@ -1,0 +1,4 @@
+The file /opt/nums.txt contains one number per line.
+
+Sort the numbers in /opt/nums.txt in ascending NUMERIC order and write the
+result to /root/{{OUT}}.

@@ -1,0 +1,7 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that defines a shell
+function named `greet`. The function prints `Hello, $1!` (the word Hello, a
+comma, a space, the function's first argument, then an exclamation mark). The
+script must then call `greet` with the script's own first argument.
+
+For example, running the script with the argument `World` must print exactly
+`Hello, World!`.

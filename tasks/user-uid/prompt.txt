@@ -1,0 +1,3 @@
+Create a user named manalo with a user ID (UID) of 3533.
+
+The password for this user must be:  flectrag

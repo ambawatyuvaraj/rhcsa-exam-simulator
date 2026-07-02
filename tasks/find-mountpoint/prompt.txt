@@ -1,0 +1,2 @@
+Determine the filesystem TYPE of the root (/) filesystem and write it as a
+single word (e.g. xfs) to /root/{{OUT}}.

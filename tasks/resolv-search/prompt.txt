@@ -1,0 +1,4 @@
+A NetworkManager connection named rhcsasrch (bound to interface rhcsasrch)
+exists on this system.
+
+Set the IPv4 DNS search domain of connection rhcsasrch to {{DOM}}.

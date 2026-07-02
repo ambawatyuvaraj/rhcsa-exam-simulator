@@ -1,0 +1,6 @@
+create tar file
+
+create a tar archive named /root/data.tar.bz2 which contains the content
+of /usr/local
+
+the tar archive must be compressed using bzip2

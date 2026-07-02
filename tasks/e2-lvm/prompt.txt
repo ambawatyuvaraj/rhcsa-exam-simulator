@@ -1,0 +1,8 @@
+Create a logical volume
+
+On the spare disk available to this system, create a logical volume named mylv
+in a volume group named myvg, with these requirements:
+  -> mylv has a size of 50 extents
+  -> the physical-extent (PE) size of myvg is 16 MiB
+  -> format mylv with the VFAT filesystem
+  -> mylv is mounted automatically under /mnt/mydata at system boot

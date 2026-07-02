@@ -1,0 +1,1 @@
+tuned-adm profile "$PROF"

@@ -1,0 +1,2 @@
+Find all files on the system owned by the user sarah and copy them into the
+directory /root/find.user (create it first).

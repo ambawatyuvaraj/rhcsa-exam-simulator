@@ -1,0 +1,4 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one argument:
+the path of a text file. The script must print the number of lines in that file,
+counted by reading the file line-by-line with a `while read` loop (do NOT use
+`wc`). It must print just the integer count.

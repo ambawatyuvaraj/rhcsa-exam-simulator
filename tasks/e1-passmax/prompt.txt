@@ -1,0 +1,1 @@
+In /etc/login.defs set the default maximum number of days a password may be used (PASS_MAX_DAYS) to 20.

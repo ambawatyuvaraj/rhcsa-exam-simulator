@@ -1,0 +1,4 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one argument: a
+filesystem path. The script must run `test -e` on the path and branch on its
+exit status: print exactly `exists` if the path exists, otherwise print exactly
+`missing`.

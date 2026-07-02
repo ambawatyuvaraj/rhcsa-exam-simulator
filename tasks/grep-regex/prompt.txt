@@ -1,0 +1,4 @@
+Write every line of /etc/passwd that matches the extended regular expression
+`{{PAT}}` into the file /root/{{OUTF}}.
+
+Preserve the original order of the lines, and include no other lines.

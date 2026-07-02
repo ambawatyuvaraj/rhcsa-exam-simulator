@@ -1,0 +1,11 @@
+This system is node2.example.com. The peer node (node1.example.com) exports a
+home directory over NFS. Configure autofs so that the home directory of user
+remoteu is automounted on demand.
+
+  * NFS export (on the peer):  node1.example.com:/exports/nodeshare/remoteu
+  * It must be automounted, read-write, at:  /rhome/remoteu
+  * Also create the user  remoteu  with UID  4400  locally, WITHOUT creating
+    a home directory.
+  * The autofs service must be enabled and running.
+
+Test:  ls /rhome/remoteu     (this triggers the automount).

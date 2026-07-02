@@ -1,0 +1,4 @@
+A read-only NFS export is available at localhost:/exports/ro.
+
+Persistently mount it READ-ONLY at /mnt/{{MP}} (via /etc/fstab, so it is
+mounted automatically at every boot).

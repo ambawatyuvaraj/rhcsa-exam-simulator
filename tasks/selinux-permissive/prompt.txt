@@ -1,0 +1,2 @@
+Set SELinux to PERMISSIVE mode immediately AND configure it to be permissive on
+the next boot.

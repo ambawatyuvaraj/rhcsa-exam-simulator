@@ -1,0 +1,37 @@
+# RHCSA two-node exam 01 — format: "<node> <task-id>"  (node1 | node2)
+# node1 hosts the server-side cross-node tasks + its own independent tasks.
+# node2 is the client + its own independent tasks.  ~15 tasks per node.
+
+# ---- node1 : servers + independent tasks ----
+node1 nfs-export
+node1 repo-server
+node1 ntp-server
+node1 ssh-key-peer
+node1 rsync-peer
+node1 users-groups
+node1 grep-string
+node1 lvm-create
+node1 cron-job
+node1 find-files
+node1 tar-archive
+node1 sudo-nopasswd
+node1 tuning-profile
+node1 journald-persistent
+
+# ---- node2 : clients + independent tasks ----
+node2 root-password   # ALWAYS FIRST on node2 — like the real exam (lost root password, console boot-interruption)
+node2 ssh-key-target
+node2 autofs-peer
+node2 nfs-mount-peer
+node2 repo-client
+node2 ntp-client
+node2 user-uid
+node2 collaborative-dir
+node2 acl-permissions
+node2 selinux-port
+node2 script-finder
+node2 container-service
+node2 swap-partition
+node2 password-aging
+node2 network-dns
+node2 boot-target

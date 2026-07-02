@@ -1,0 +1,5 @@
+This system is node2.example.com. The peer node (node1.example.com) serves
+time over NTP. Configure this system as a chrony NTP client of the peer.
+
+  * Time server:  node1.example.com  (use the iburst option)
+  * The chronyd service must be enabled and running.

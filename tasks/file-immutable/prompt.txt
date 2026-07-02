@@ -1,0 +1,2 @@
+Make the file /root/{{F}} immutable, so that it cannot be modified, renamed, or
+deleted (even by root) until the attribute is removed.

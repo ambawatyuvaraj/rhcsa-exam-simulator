@@ -1,0 +1,3 @@
+The logical volume {{VG}}/{{LV}} contains a live ext4 filesystem with data.
+Create an LVM snapshot named {{SNAP}} whose origin is {{LV}} (in volume group
+{{VG}}), so the current state of {{LV}} can be restored later.

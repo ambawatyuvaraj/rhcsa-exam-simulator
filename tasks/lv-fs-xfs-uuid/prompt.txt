@@ -1,0 +1,4 @@
+The logical volume {{VG}}/{{LV}} exists but is not yet formatted. Format it
+with the xfs filesystem and mount it persistently (must survive reboots) at
+/mnt/{{MP}}. The /etc/fstab entry MUST reference the filesystem by its UUID
+(use UUID=... in fstab, not the device path).

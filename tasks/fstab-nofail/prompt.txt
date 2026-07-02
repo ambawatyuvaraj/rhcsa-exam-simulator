@@ -1,0 +1,5 @@
+An ext4 filesystem exists on the first partition of the spare disk.
+
+Add a RESILIENT /etc/fstab entry for it, mounted at /mnt/{{MP}}, using the
+nofail option so a missing or failed device does NOT prevent the system from
+booting. Then mount it.

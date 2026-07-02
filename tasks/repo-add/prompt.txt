@@ -1,0 +1,3 @@
+Configure a new dnf repository with id `{{RID}}` whose baseurl is
+`file://{{DIR}}`, with gpgcheck disabled and the repository enabled. It must
+show up enabled in `dnf repolist`.

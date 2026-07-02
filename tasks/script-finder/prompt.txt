@@ -1,0 +1,8 @@
+Create a script named /usr/local/bin/mysearch that finds all files under
+/usr which are larger than 5k AND smaller than 50k AND have the SUID
+permission set, and writes the resulting list of file paths to
+/root/setuid.list.
+
+  * The script must be executable.
+  * Running the command  mysearch  (with no arguments) must (re)create
+    /root/setuid.list containing exactly those matching paths.

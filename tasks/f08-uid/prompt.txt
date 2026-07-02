@@ -1,0 +1,2 @@
+create a user jean with userid 4332. the password for this user should
+be ratencot

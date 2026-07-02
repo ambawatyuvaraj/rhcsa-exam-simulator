@@ -1,0 +1,3 @@
+Run a detached container named {{CN}} from localhost/rhcsa-app:latest that:
+  (a) sets the environment variable {{EV}}={{VAL}} inside the container, and
+  (b) publishes host port {{HP}} to container port 80.

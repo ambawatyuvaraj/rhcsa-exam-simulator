@@ -1,0 +1,2 @@
+Configure this system so that it boots into the multi-user (text /
+non-graphical) target by default.

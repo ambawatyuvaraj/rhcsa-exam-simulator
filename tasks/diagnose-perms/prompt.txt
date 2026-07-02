@@ -1,0 +1,6 @@
+User {{U}} reports they cannot read the files under /{{DIR}}, which is owned by
+root.
+
+Adjust the permissions so that user {{U}} can list the directory AND read the
+files inside it. Do NOT change the directory's ownership to {{U}}, and do not
+add {{U}} to any group ownership.

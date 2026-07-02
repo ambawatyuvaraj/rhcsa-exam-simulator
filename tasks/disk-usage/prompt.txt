@@ -1,0 +1,2 @@
+Find the total disk space used by /var (human-readable, exactly as
+`du -sh /var` prints it) and write that output to /root/{{OUT}}.

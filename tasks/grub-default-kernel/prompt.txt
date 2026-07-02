@@ -1,0 +1,2 @@
+Configure the bootloader so that the currently running kernel (the one reported
+by `uname -r`) is the default kernel selected at boot.

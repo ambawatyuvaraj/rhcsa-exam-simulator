@@ -1,0 +1,5 @@
+On the spare block device attached to this machine, create a GPT partition
+table, then create a partition whose GPT partition NAME is {{PNAME}}. (With
+parted, the name is the first argument to `mkpart`.)
+
+You do not need to format or mount the partition.

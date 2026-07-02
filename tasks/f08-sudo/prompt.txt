@@ -1,0 +1,4 @@
+Enable sudo access
+
+Enable sudo access for members of group admin without entering their
+password

@@ -1,0 +1,3 @@
+The directory /{{DIR}} already exists. Configure it so that new files created
+inside it automatically inherit the {{G}} group: set its group owner to {{G}}
+and turn on the set-GID bit.

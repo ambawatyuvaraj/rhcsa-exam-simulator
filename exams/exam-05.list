@@ -1,0 +1,20 @@
+# RHCSA simulator — Exam set 05 (new-task showcase B; storage task: mkfs-xfs)
+tar-extract
+file-ops
+script-loop
+script-args
+process-nice
+secure-copy
+journal-find
+at-job
+grub-timeout
+repo-add
+network-ipv6
+firewall-service
+umask-default
+ssh-keyauth
+selinux-restorecon
+selinux-fcontext
+mkfs-xfs
+container-build
+container-port-env

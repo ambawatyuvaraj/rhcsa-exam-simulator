@@ -1,0 +1,5 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one integer
+argument N and prints the sum of all integers from 1 to N inclusive, computed
+with a `for` or `while` loop. It must print just the resulting integer.
+
+For example, running it with `10` must print `55`.

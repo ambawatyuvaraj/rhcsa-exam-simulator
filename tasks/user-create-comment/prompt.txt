@@ -1,0 +1,1 @@
+Create a user named {{U}} whose account comment (GECOS / full-name field) is set to "{{C}}".

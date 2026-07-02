@@ -1,0 +1,3 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that, when run, creates
+the directory {{DIR}} and inside it creates {{N}} empty files named file1,
+file2, … file{{N}} using a loop.

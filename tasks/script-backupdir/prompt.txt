@@ -1,0 +1,7 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one argument: a
+directory path. The script must create a gzip-compressed tar archive of that
+directory at /root/backup-<basename>.tar.gz, where <basename> is the final
+component of the supplied directory path.
+
+For example, running it with `/opt/{{SRCNAME}}` must produce
+/root/backup-{{SRCNAME}}.tar.gz containing that directory's contents.

@@ -1,0 +1,4 @@
+An unformatted partition already exists on the spare block device attached to
+this machine (identify it with `lsblk`). Create an XFS filesystem on that
+partition and mount it persistently (it must remain mounted across reboots) at
+/mnt/{{MP}}.

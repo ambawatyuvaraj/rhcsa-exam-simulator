@@ -1,0 +1,5 @@
+Several files of varying sizes exist under /opt/sizesrc.
+
+Write the full path of every regular file under /opt/sizesrc whose size is
+greater than 10k and less than 100k (as understood by `find -size`) into the
+file /root/{{OUT}}, one path per line. Include no other files.

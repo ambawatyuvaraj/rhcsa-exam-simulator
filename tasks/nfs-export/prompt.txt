@@ -1,0 +1,10 @@
+This system is node1.example.com. Export a directory over NFS so the peer
+node (node2.example.com) can mount it.
+
+  * Export the directory  /exports/nodeshare  over NFS, read-write, to the
+    network.
+  * Create a user  remoteu  with UID  4400  whose home directory is
+    /exports/nodeshare/remoteu .
+  * The nfs-server service must be running, and the firewall must permit NFS.
+
+The peer node will mount this export at node2.example.com.

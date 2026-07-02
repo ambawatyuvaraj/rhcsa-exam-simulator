@@ -1,0 +1,1 @@
+Ensure SELinux is in enforcing mode now AND configured to be enforcing on the next boot.

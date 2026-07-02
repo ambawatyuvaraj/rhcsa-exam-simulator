@@ -1,0 +1,4 @@
+The file /root/{{F}} already has an ACL with an extra named-user entry.
+
+Set its ACL mask to r-x, capping the effective permissions of all named and
+group ACL entries to read and execute only.

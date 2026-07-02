@@ -1,0 +1,15 @@
+configure networking and set hostname
+
+Configure the spare network interface rhcsa0 on this system with the
+following static IPv4 settings, make it start automatically at boot, and
+set the system hostname:
+
+  IPv4 address : 172.25.250.11/24
+  Gateway      : 172.25.250.254
+  DNS server   : 172.25.250.254
+  Hostname     : serverb.lab.example.com
+
+A connection profile named rhcsa0, already bound to the rhcsa0 interface, is
+present on this system -- configure that profile and keep it bound to rhcsa0.
+rhcsa0 is a dedicated, isolated test interface; do NOT reconfigure the NIC you
+are connected through (e.g. enp1s0), or you will lose access to this system.

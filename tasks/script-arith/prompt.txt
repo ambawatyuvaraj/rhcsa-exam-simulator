@@ -1,0 +1,4 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes two integer
+arguments and prints their arithmetic sum (just the resulting integer).
+
+For example, running it with `7 5` must print `12`.

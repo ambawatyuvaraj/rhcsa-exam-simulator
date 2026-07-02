@@ -1,0 +1,2 @@
+Set the system console (virtual console) keymap to {{KM}} using the
+`localectl` command. The change must persist across reboots.

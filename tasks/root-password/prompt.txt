@@ -1,0 +1,12 @@
+The root password on this system is UNKNOWN (lost). Recover access by
+resetting the root account's password to:  {{PW}}
+
+This is the classic first task of the exam's second system: you cannot log in
+as root, so you must recover the password from the machine's console.
+
+IMPORTANT — perform this task on the system's VM CONSOLE (open the console
+window in virt-manager / your VM viewer), NOT over SSH. This recovery cannot be
+done from an SSH session.
+
+Any correct recovery method is accepted; the new root password must be
+exactly '{{PW}}'.

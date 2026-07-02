@@ -1,0 +1,6 @@
+An unformatted partition already exists on the spare block device attached to
+this machine (identify it with `lsblk`). On that partition, create an ext4
+filesystem with the label {{LBL}}, and mount it persistently (it must remain
+mounted across reboots) at /mnt/{{MP}}.
+
+The /etc/fstab entry MUST reference the filesystem by its label (LABEL=...).

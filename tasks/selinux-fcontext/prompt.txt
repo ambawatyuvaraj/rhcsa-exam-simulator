@@ -1,0 +1,1 @@
+Add a PERSISTENT SELinux file-context rule so that {{DIR}} and everything under it has the type httpd_sys_content_t, then apply it so existing files are relabeled.

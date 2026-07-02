@@ -1,0 +1,11 @@
+As the existing user contsvc, configure a container that runs as a rootless
+systemd *user* service:
+
+  * Use the container image:  localhost/rhcsa-app:latest
+    (already present in contsvc's local image store)
+  * The container is managed by a systemd user service named
+    container-rhcsa.service
+  * The service starts automatically at boot, with NO manual intervention,
+    even when contsvc is not logged in.
+  * Bind-mount host /opt/app-in  -> container /opt/incoming
+    and        host /opt/app-out -> container /opt/outgoing

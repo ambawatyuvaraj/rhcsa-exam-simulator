@@ -1,0 +1,2 @@
+The software package {{PKG}} is currently installed on this system. Remove it
+so that it is no longer present when grading runs.

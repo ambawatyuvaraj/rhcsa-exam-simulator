@@ -1,0 +1,4 @@
+TASK_TITLE="Serve a yum repository over HTTP"
+TASK_DOMAIN="deploy"
+TASK_POINTS=14
+TASK_CROSSNODE=1

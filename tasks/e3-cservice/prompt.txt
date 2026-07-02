@@ -1,0 +1,13 @@
+As the student user, configure a rootless container to run automatically as a
+systemd service, with persistent storage:
+
+  -> run it from the image  monitor:latest  (already loaded in student's local
+     image store)
+  -> it must run as a systemd *user* service of the existing user student
+  -> the service must be named  container-ascii2pdf
+  -> it must start automatically after a reboot, with no manual login
+  -> attach the local directory /opt/files     to the container's /opt/incoming
+  -> attach the local directory /opt/processed  to the container's /opt/outgoing
+
+Log in as student over SSH (so you have a clean rootless podman session) before
+configuring the user service.

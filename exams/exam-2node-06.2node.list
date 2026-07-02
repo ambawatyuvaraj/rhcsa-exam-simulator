@@ -1,0 +1,35 @@
+# RHCSA two-node exam 06 — auto-composed; single-node tasks unique vs every other exam.
+# node1 = graphical workstation (servers + tasks); node2 = headless (clients + tasks).
+
+node1 nfs-export
+node1 repo-server
+node1 ntp-server
+node1 ssh-key-target
+node1 network-config
+node1 selinux-permissive
+node1 container-bindmount
+node1 grub-timeout
+node1 find-mountpoint
+node1 nmcli-autoconnect
+node1 rsync-dir
+node1 script-function
+node1 ssh-port
+node1 partition-mbr
+
+node2 root-password   # ALWAYS FIRST on node2 — like the real exam (lost root password, console boot-interruption)
+node2 ssh-key-peer
+node2 rsync-peer
+node2 nfs-mount-peer
+node2 autofs-peer
+node2 repo-client
+node2 ntp-client
+node2 default-target-graphical
+node2 redirect-streams
+node2 user-primary-group
+node2 container-inspect
+node2 package-group
+node2 mount-iso
+node2 firewall-richrule
+node2 script-userexists
+node2 umask-default
+node2 lv-rename

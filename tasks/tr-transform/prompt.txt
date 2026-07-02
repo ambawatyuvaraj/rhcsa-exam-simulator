@@ -1,0 +1,2 @@
+Translate every lowercase letter in /opt/text.txt to its uppercase equivalent
+and write the result to /root/{{OUT}}. Leave all other characters unchanged.

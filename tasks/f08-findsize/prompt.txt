@@ -1,0 +1,4 @@
+Find files by size
+
+Find all the files in the /usr/bin directory with size less than 5 MB and
+save (copy) these files inside the /home/manage directory.

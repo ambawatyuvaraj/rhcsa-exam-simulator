@@ -1,0 +1,11 @@
+create a rootless container that starts automatically as a systemd service:
+
+  -> The container is named ascii2pdf
+  -> It uses the monitor image created previously (task: create a container)
+  -> It runs as a systemd *user* service of the existing user walhalla only
+  -> The service is named container-ascii2pdf
+  -> The container starts automatically after a reboot, with no manual login
+  -> The local directory /opt/files     is attached to the container /opt/incoming
+  -> The local directory /opt/processed is attached to the container /opt/outcoming
+
+Log in as walhalla over SSH:  ssh walhalla@node1.example.com  (password: redhat)

@@ -1,0 +1,5 @@
+A dedicated dummy interface `rhcsafw` is present on this system.
+
+Permanently assign the interface `rhcsafw` to the firewalld zone `{{ZONE}}`,
+so the binding survives a firewall reload and a reboot. Do NOT change the
+default zone (that would affect the interface you are connected through).

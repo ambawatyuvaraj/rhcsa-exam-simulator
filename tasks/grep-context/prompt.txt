@@ -1,0 +1,5 @@
+The file /opt/ctxsrc.log contains many log lines.
+
+For every line of /opt/ctxsrc.log that contains the string `{{PAT}}`, write that
+line plus the {{N}} lines that follow it (trailing context) into the file
+/root/{{OUT}}, exactly as `grep` would produce them.

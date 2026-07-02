@@ -1,0 +1,1 @@
+Set the SYSTEM-WIDE default umask for all users to {{UM}}. Configure this persistently (for example via a file in /etc/profile.d/ or the UMASK setting in /etc/login.defs).

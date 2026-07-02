@@ -1,0 +1,7 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes exactly one
+argument which is one of `start`, `stop` or `status`. Using a `case` statement
+it must print exactly:
+
+  - `starting` when the argument is `start`
+  - `stopping` when the argument is `stop`
+  - `status`   when the argument is `status`

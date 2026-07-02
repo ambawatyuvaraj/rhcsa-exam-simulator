@@ -1,0 +1,6 @@
+Configure your system to use the default repositories (BaseOS and AppStream) in
+/etc/yum.repos.d/rhcsa.repo, both enabled with gpgcheck disabled. The package
+source is available locally at:
+
+  BaseOS    -> file:///opt/rhcsa-repo/BaseOS
+  AppStream -> file:///opt/rhcsa-repo/AppStream

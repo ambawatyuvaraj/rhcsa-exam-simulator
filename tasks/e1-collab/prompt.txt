@@ -1,0 +1,1 @@
+Create the collaborative directory /common/admin. It must be group-owned by admin, and configured so new files created inside inherit the admin group (set-GID), with full access for the group and none for others (mode 2770).

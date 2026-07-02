@@ -1,0 +1,9 @@
+create a collaborative directory with name /home/contrib with following
+characteristics.
+
+  -> Group Ownership of /home/contrib is manager.
+  -> the directory should be readable, writable and accessible to the
+     member of group manager and not to any other user.
+     (root has access to all directories and files in the system)
+  -> files created in /home/contrib directory should have group
+     ownership of manager.

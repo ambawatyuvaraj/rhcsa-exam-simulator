@@ -1,0 +1,5 @@
+Resize an LVM logical volume
+
+Resize the logical volume database (in the volume group datastore, mounted at
+/mnt/education) so that its size is 500 MiB, and grow its filesystem to use the
+new space. Do not lose the existing data on the volume.

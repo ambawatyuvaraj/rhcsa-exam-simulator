@@ -1,0 +1,4 @@
+A disc image exists at /root/{{ISO}}.iso.
+
+Persistently loop-mount this image, read-only, at /mnt/{{MP}} (via /etc/fstab,
+so it is mounted automatically at every boot).

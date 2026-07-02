@@ -1,0 +1,3 @@
+In the existing volume group {{VG}} (on the spare disk) there is a logical
+volume named {{OLD}}. Rename that logical volume to {{NEW}}, keeping it in the
+same volume group {{VG}}.

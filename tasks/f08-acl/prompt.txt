@@ -1,0 +1,12 @@
+Access control list
+
+copy the file /etc/fstab to /var/tmp directory
+
+configure the permissions of /var/tmp/fstab so that
+
+  -> The file /var/tmp/fstab is owned by the root user.
+  -> The file /var/tmp/fstab belongs to group root.
+  -> The file /var/tmp/fstab should not be executable by any one.
+  -> The user harry is able to read write /var/tmp/fstab
+  -> The user natasha is niether able to read nor write /var/tmp/fstab
+  -> All other user (current or future) is able to read /var/tmp/fstab

@@ -1,0 +1,2 @@
+Reduce the space the systemd journal occupies on disk so that it retains at most
+{{SIZE}} of archived data. Use journalctl's vacuum-by-size feature to do this.

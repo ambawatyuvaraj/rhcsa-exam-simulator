@@ -1,0 +1,4 @@
+On the spare block device attached to this machine, create a partition of at
+least 256 MiB, initialise it as swap space, and enable it with a swap priority
+of {{PRI}}. Make this persistent in /etc/fstab using the pri={{PRI}} mount
+option so the priority is applied on every boot.

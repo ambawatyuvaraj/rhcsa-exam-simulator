@@ -1,0 +1,2 @@
+Run a detached (background) container named {{CN}} from the image
+localhost/rhcsa-app:latest, keeping it running.

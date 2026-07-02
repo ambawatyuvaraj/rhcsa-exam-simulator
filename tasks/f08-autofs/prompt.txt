@@ -1,0 +1,9 @@
+Autofs
+
+The home directory of an LDAP user is exported by NFS and must be automounted
+on this system via the autofs service:
+
+  -> remoteuser1's home directory is  localhost:/exports/rhome/remoteuser1
+  -> it must be automounted via autofs at  /rhome/remoteuser1
+  -> the home directory must be readable and writable by its user
+  -> only remoteuser1's home directory needs to be accessible

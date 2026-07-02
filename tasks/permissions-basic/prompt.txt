@@ -1,0 +1,3 @@
+Set the permissions of the file {{TGT}} to exactly {{MODE}} (octal).
+
+The owner and the group of the file must both remain root.

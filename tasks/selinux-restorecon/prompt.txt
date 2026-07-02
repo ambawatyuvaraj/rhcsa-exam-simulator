@@ -1,0 +1,1 @@
+The file /var/www/html/{{F}} has an incorrect SELinux type. Restore its default SELinux context.

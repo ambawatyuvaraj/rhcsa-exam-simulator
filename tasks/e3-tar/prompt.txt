@@ -1,0 +1,6 @@
+Back up the directory /var/tmp into TWO compressed tar archives:
+
+  * /root/test.tar.gz   — compressed with gzip
+  * /root/test.tar.bz   — compressed with bzip2
+
+Each archive must contain the contents of /var/tmp.

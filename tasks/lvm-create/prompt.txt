@@ -1,0 +1,7 @@
+On the spare block device attached to this machine, create LVM storage:
+
+  * A volume group named myvg whose physical extent (PE) size is 16 MiB.
+  * A logical volume named mylv in myvg, sized at exactly 50 extents.
+  * Format mylv with the vfat filesystem.
+  * Mount mylv persistently (it must remain mounted across reboots) at
+    /mnt/mydata.

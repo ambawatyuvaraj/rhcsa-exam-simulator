@@ -1,0 +1,4 @@
+The file /opt/invsrc.log contains many log lines.
+
+Write every line of /opt/invsrc.log that does NOT contain the string `{{PAT}}`
+into the file /root/{{OUT}}, preserving the original order.

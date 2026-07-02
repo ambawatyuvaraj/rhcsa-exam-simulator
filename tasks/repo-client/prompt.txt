@@ -1,0 +1,7 @@
+This system is node2.example.com. The peer node (node1.example.com) serves a
+yum/dnf repository over HTTP. Configure this system to use it.
+
+  * Repository id : peerrepo
+  * baseurl       : http://node1.example.com/pkgrepo
+  * GPG signature checking must be disabled.
+  * The repository must be enabled.

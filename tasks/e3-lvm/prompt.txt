@@ -1,0 +1,6 @@
+Create an LVM logical volume
+
+On the spare disk available to this system, create a volume group named
+datastore with a physical-extent (PE) size of 8 MiB. In it, create a logical
+volume named database of 50 extents. Format database with the ext3 filesystem
+and mount it persistently at /mnt/database.

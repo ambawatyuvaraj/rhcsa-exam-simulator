@@ -1,0 +1,2 @@
+Set the system locale so that the LANG variable is {{LC}}. Use the
+`localectl` command and make the change persistent.

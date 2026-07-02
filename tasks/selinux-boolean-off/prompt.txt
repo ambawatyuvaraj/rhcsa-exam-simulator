@@ -1,0 +1,2 @@
+Persistently DISABLE the SELinux boolean {{SB}} so that the setting survives a
+reboot.

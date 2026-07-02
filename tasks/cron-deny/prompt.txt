@@ -1,0 +1,3 @@
+Prevent the user {{U}} from using the cron scheduling service. Use the
+/etc/cron.deny mechanism so that {{U}} is denied access to crontab while all
+other users remain able to use cron.

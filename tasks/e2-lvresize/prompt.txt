@@ -1,0 +1,7 @@
+Resize the logical volume
+
+Resize the logical volume vo (in volume group myvol) and its filesystem to
+300 MiB. The filesystem contents must remain intact.
+
+Note: the size is rarely exactly the requested value, so a result in the range
+290 MiB to 310 MiB is acceptable.

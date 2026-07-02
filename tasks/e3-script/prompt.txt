@@ -1,0 +1,5 @@
+Create an executable shell script at /usr/local/bin/myfind that finds every
+regular file under /usr/share whose size is greater than 400k and less than
+800k (as understood by `find -size`), and copies each of them into /root/myfiles.
+
+Create /root/myfiles and run the script so the matching files are copied there.

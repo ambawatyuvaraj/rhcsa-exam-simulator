@@ -1,0 +1,3 @@
+Copy the file /var/www/html/{{F}} to /var/www/html/{{F2}} so that the new file
+ends up with the correct web-content SELinux type (httpd_sys_content_t), the
+same as the source file.

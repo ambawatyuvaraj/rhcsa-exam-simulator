@@ -1,0 +1,4 @@
+Configure a cron job, owned by the user operator, that runs the following
+command every 3 minutes:
+
+  /usr/bin/logger "EX200 Testing"

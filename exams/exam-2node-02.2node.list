@@ -1,0 +1,32 @@
+# RHCSA two-node exam 02 — faithful reproduction of "RHCSA 9.3" (rhcsa_9_3.pdf).
+# Node1 = tasks 1-15, Node2 = tasks 16-21 (exactly as the paper). Values are from
+# the answer key; only setup-specifics are adapted to this 2-VM offline lab (IPs
+# on the isolated dummy NIC rhcsa0; repos point at the local DVD; NFS source is
+# localhost; the 'watch' image is stood in from the bundled image asset; node2's
+# swap+LVM share ONE disk like the key's /dev/vdb).
+# format: "<node> <task-id>"   (trailing "# Qn" = answer-key question number)
+
+# ---- node1 : 15 tasks ----
+node1 e2-network       # Q1   hostname node1.domain250.example.com + static IP 172.25.250.100
+node1 e2-repo          # Q2   /etc/yum.repos.d/rhcsa.repo (BaseOS + AppStream)
+node1 selinux-port     # Q3   debug: web server on SELinux non-standard port 82
+node1 e2-users         # Q4   group sysmgrs; natasha+harry members; sarah nologin; pw flectrags
+node1 e2-cron          # Q5   cron: harry runs logger "EX200 Testing" every 3 min
+node1 e2-collab        # Q6   collaborative set-GID dir /home/managers (sysmgrs 2770)
+node1 chrony-iburst    # Q7   NTP client (materials.example.com iburst)
+node1 f08-autofs       # Q8   automount remoteuser1's home via autofs (/rhome)
+node1 e2-uid           # Q9   create user manalo with UID 3533
+node1 e2-findowner     # Q10  find files owned by jacques -> /root/findfiles
+node1 e2-grep          # Q11  grep "ng" in iso_639_3.xml -> /root/list
+node1 e2-backup        # Q12  gzip tar archive of /usr/local -> /root/archive.gz
+node1 e2-script        # Q13  script newsearch: find /usr +30k -50k SETUID
+node1 e2-cservice      # Q14  rootless container ascii2pdf (watch) as a systemd user service
+node1 e2-sudo          # Q15  passwordless sudo for group sysmgrs
+
+# ---- node2 : 6 tasks ----
+node2 root-password    # Q16  ALWAYS FIRST on node2 — set the root password (console)
+node2 e2-repo2         # Q17  /etc/yum.repos.d/rhcsa.repo (BaseOS + AppStream)
+node2 e2-lvresize      # Q18  resize LV myvol/vo to 300 MiB
+node2 e2-swap          # Q19  512 MiB swap partition (shared disk)
+node2 e2-lvm           # Q20  VG myvg (16M PE) + LV mylv (50 ext, vfat, /mnt/mydata)
+node2 tuning-profile   # Q21  set the recommended tuned profile (virtual-guest)

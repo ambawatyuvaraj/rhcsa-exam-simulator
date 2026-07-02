@@ -1,0 +1,5 @@
+Create the directory {{BASE}}/{{SUB}}.
+
+Inside it, create an empty file named keep.txt.
+
+Then copy /etc/hostname to {{BASE}}/host.copy.

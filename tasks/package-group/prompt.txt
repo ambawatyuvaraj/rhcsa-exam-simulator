@@ -1,0 +1,3 @@
+Install the package group {{GROUPNAME}} on this system using the configured
+repositories, so that the software provided by that group is present when
+grading runs.

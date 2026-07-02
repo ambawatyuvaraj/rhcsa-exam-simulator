@@ -1,0 +1,1 @@
+Add the existing user {{U}} to the supplementary (secondary) groups {{G1}} and {{G2}}, without removing any of the user's existing group memberships.

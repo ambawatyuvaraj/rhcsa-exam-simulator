@@ -1,0 +1,3 @@
+Treating /etc/passwd as colon-delimited (`:`) data, extract fields {{F}} from
+every line and write the result to /root/{{OUT}}. Output the selected fields in
+ascending field order, separated by a single colon, as `cut` produces them.

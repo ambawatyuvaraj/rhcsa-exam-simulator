@@ -1,0 +1,4 @@
+Create a system-wide cron job in the file /etc/cron.d/{{F}} that runs the
+command below as the root user every 10 minutes:
+
+  /usr/bin/logger sysjob

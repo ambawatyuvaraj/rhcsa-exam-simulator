@@ -1,0 +1,6 @@
+Create a script to find files
+
+Create a script that finds files under the /usr directory that are larger than
+30k and smaller than 50k and have the SETUID permission set. The command results
+must be saved to /root/scriptfind. The script must be executable by running the
+command "newsearch" (place the script in /usr/local/bin).

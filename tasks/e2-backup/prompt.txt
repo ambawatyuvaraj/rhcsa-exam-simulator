@@ -1,0 +1,2 @@
+Create a gzip-compressed tar archive of the directory /usr/local and save it as
+/root/archive.gz.

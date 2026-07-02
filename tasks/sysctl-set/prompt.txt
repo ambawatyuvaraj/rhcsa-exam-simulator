@@ -1,0 +1,2 @@
+Set the kernel parameter {{KEY}} to the value {{VAL}}, both for the running
+system and persistently so that the setting survives a reboot.

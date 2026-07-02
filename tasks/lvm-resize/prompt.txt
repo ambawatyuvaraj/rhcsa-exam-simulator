@@ -1,0 +1,6 @@
+A logical volume named vo (in volume group vgroup) is mounted at /mnt/vo and
+contains data. Resize the logical volume vo, AND its filesystem, to 300 MiB
+without losing the existing data.
+
+Note: an exact size is rarely possible — any size between 290 MiB and 310 MiB
+is acceptable.

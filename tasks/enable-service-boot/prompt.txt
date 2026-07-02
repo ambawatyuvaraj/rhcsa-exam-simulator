@@ -1,0 +1,3 @@
+Configure the {{SVC}} service so that it starts automatically at boot, but do
+NOT start it now. When grading runs the service must be enabled yet currently
+inactive (not running).

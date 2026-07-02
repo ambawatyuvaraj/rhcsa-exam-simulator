@@ -1,0 +1,8 @@
+Copy the file /etc/fstab to /var/tmp/fstab. Then configure the permissions
+(using ACLs as needed) of /var/tmp/fstab so that:
+
+  * The file is owned by user root and group root.
+  * The file is NOT executable by anyone.
+  * The user frank is able to read and write the file.
+  * The user grace is unable to read or write the file.
+  * All other users (current and future) are able to read the file.

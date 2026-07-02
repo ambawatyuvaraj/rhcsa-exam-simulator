@@ -1,0 +1,9 @@
+Autofs
+
+The home directory of an LDAP user is exported by NFS and must be automounted
+on this system via the autofs service:
+
+  -> production5's home directory is  localhost:/exports/localhome/production5
+  -> it must be automounted via autofs at  /localhome/production5
+  -> the home directory must be readable and writable by its user
+  -> only production5's home directory needs to be accessible

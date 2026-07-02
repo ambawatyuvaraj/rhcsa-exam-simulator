@@ -1,0 +1,16 @@
+# RHCSA simulator — Exam set 01 (storage task: lvm-create)
+network-config
+repo-config
+selinux-port
+users-groups
+collaborative-dir
+cron-job
+autofs-nfs
+find-files
+tar-archive
+script-finder
+container-service
+sudo-nopasswd
+lvm-create
+tuning-profile
+root-password

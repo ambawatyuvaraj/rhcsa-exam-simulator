@@ -1,0 +1,2 @@
+Save every line from the current boot's systemd journal that contains the text
+{{STR}} into the file /root/{{OUT}}.

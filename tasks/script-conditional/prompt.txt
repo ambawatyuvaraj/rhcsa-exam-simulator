@@ -1,0 +1,3 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one integer
+argument. If the argument is greater than {{THR}} it must print exactly `big`;
+otherwise it must print exactly `small`.

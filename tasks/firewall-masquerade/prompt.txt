@@ -1,0 +1,2 @@
+Permanently enable masquerading (NAT) in the default firewalld zone
+(runtime and permanent).

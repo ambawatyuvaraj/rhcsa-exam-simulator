@@ -1,0 +1,2 @@
+Configure sudo so that members of the sysmgrs group can run any command as
+root using sudo, WITHOUT being prompted for a password.

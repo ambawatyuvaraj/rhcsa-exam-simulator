@@ -1,0 +1,5 @@
+resize a logical partition
+
+A logical volume named wlogic (in volume group wgroup) is mounted at
+/mnt/wlogic and contains data. Increase the logical volume wlogic, AND its
+filesystem, by 500 MiB without losing the existing data.

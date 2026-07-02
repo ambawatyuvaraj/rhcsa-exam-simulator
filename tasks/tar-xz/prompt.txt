@@ -1,0 +1,3 @@
+Create an xz-compressed tar archive of the directory /opt/xz, saving it as
+/root/{{ARC}}.tar.xz. The archive must contain the contents of /opt/xz and be
+compressed with xz.

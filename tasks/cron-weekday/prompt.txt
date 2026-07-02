@@ -1,0 +1,4 @@
+Configure a cron job, owned by the user {{U}}, that runs the following command
+at 02:00 every Monday, Wednesday and Friday:
+
+  /usr/bin/echo wk

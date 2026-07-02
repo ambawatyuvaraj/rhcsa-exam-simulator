@@ -1,0 +1,4 @@
+A filesystem is currently mounted read-write at /mnt/{{MP}}.
+
+Remount it read-only at runtime (without unmounting), so writes to /mnt/{{MP}}
+are rejected. This does not need to persist across reboots.

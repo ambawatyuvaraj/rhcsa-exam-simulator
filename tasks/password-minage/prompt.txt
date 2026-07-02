@@ -1,0 +1,1 @@
+For the existing user {{U}}, set the MINIMUM password age to {{MIN}} days and set the password-expiry warning period to 10 days.

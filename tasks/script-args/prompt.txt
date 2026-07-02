@@ -1,0 +1,3 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that prints
+`{{WORD}} <arg1> <arg2>` — i.e. the word {{WORD}} followed by its first two
+positional arguments separated by single spaces.

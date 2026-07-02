@@ -1,0 +1,5 @@
+In the directory /root, create a HARD link named {{HL}} that points to the file
+/root/linksrc.txt.
+
+Also in /root, create a SYMBOLIC (soft) link named {{SL}} that points to the
+file /root/linksrc.txt.

@@ -1,0 +1,4 @@
+The file /root/{{F}} has an ACL entry granting access to the user "bin".
+
+Remove the ACL entry for user bin from /root/{{F}}, leaving the rest of the ACL
+intact.

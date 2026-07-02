@@ -1,0 +1,1 @@
+Configure user alies so that the environment variable RHCSA is set to the value 'Welcome to Advantage Pro' and exported in alies's login shell.

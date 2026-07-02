@@ -1,0 +1,3 @@
+Configure the existing user natasha so that, by default, every NEW file she
+creates has the permissions  -r--r-----  and every NEW directory she creates
+has the permissions  dr-xr-x---  (i.e. her default umask must be 0227).

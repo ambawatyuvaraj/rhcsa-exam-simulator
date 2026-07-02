@@ -1,0 +1,4 @@
+An ext4 filesystem already labelled {{LBL}} exists on the spare disk.
+
+Persistently mount it at /mnt/{{MP}} using a LABEL= reference in /etc/fstab
+(not the device name), so it is mounted automatically at every boot.

@@ -1,0 +1,2 @@
+Permanently open TCP port {{FWPORT}} through the firewall (runtime and
+permanent).

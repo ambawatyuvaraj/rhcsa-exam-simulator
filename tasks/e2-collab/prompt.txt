@@ -1,0 +1,1 @@
+Create the collaborative directory /home/managers. It must be group-owned by sysmgrs, and configured so new files created inside inherit the sysmgrs group (set-GID), with full access for the group and none for others (mode 2770).

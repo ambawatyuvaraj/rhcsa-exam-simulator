@@ -1,0 +1,2 @@
+Set the SGID (set-group-ID) bit on the program /usr/local/bin/{{B}} so that it
+runs with the privileges of its owning group.

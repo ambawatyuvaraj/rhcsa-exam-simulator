@@ -1,0 +1,2 @@
+Permanently allow the {{FWSVC}} service through the firewall (it must be
+active in the running and permanent configuration).

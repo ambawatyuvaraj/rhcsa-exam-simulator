@@ -1,0 +1,18 @@
+# RHCSA simulator — Exam set 04 (new-task showcase A; storage task: partition-create)
+redirect-streams
+grep-regex
+links
+permissions-basic
+script-conditional
+kill-process
+service-enable
+journald-persistent
+package-install
+timezone
+firewall-port
+hosts-entry
+password-aging
+selinux-mode
+selinux-boolean
+partition-create
+container-run

@@ -1,0 +1,6 @@
+Configure the package repositories in /etc/yum.repos.d/app.repo. Define two
+repositories — BaseOS and AppStream — both enabled with GPG check disabled,
+pointing at the provided package source:
+
+  BaseOS    -> file:///opt/rhcsa-repo/BaseOS
+  AppStream -> file:///opt/rhcsa-repo/AppStream

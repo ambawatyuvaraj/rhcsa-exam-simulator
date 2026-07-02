@@ -1,0 +1,2 @@
+Write lines {{A}} through {{B}} (inclusive) of the file /etc/services to the
+file /root/{{OUT}}, preserving their order.

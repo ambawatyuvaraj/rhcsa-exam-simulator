@@ -1,0 +1,2 @@
+Install the software package {{PKG}} on this system using the configured
+repositories. It must be present (installed) when grading runs.

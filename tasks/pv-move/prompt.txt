@@ -1,0 +1,5 @@
+The volume group {{VG}} spans TWO physical volumes (two partitions on the spare
+disk) and contains a logical volume {{LV}} with data. You must decommission the
+SECOND physical volume: migrate all of its physical extents onto the remaining
+PV, then remove the second PV from {{VG}} so that {{VG}} is backed by only one
+physical volume. No data may be lost.

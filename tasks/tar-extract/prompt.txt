@@ -1,0 +1,2 @@
+Extract the gzip-compressed tar archive /root/{{ARC}}.tar.gz into the directory
+{{DEST}}. Create the destination directory if it does not already exist.

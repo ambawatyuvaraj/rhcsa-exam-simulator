@@ -1,0 +1,2 @@
+Configure the system so that it boots into the graphical target by default.
+Set the default systemd target to graphical.target.

@@ -1,0 +1,2 @@
+Configure systemd-journald so that the system journal is stored persistently
+across reboots.

@@ -1,0 +1,6 @@
+On the spare block device attached to this machine (identify it with `lsblk`
+— it is the unused disk with no partitions/filesystems), create an MSDOS (MBR)
+partition table, then create a single primary partition of approximately
+{{SZ}} MiB on it.
+
+You do not need to format or mount the partition.

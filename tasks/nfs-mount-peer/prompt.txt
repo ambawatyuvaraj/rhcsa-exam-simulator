@@ -1,0 +1,6 @@
+This system is node2.example.com. The peer node (node1.example.com) exports a
+directory over NFS. Mount it persistently via /etc/fstab.
+
+  * NFS export (on the peer):  node1.example.com:/exports/nodeshare
+  * Mount point (on this node):  /mnt/peernfs
+  * The mount must be read-write and must persist across reboots.

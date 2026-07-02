@@ -1,0 +1,1 @@
+Create the group sysmgrs. Create users harry and natasha and make them members of sysmgrs. Create user sarah with a non-interactive shell (/sbin/nologin); sarah must NOT be a member of sysmgrs. Set the password of harry, natasha and sarah to flectrags.

@@ -1,0 +1,1 @@
+Configure the account {{U}} so that its password must be changed at most every {{DAYS}} days (maximum password age).

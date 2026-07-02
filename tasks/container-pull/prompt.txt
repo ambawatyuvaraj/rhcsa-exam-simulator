@@ -1,0 +1,2 @@
+Load the container image from the archive /root/{{TARNAME}}.tar into root's
+local podman image store.

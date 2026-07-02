@@ -1,0 +1,4 @@
+A volume group named {{VG}} already exists on the spare disk. In that volume
+group, create a logical volume named {{LV}} of size {{SZ}} MiB, format it with
+the xfs filesystem, and mount it persistently (it must survive reboots) at
+/mnt/{{MP}}.

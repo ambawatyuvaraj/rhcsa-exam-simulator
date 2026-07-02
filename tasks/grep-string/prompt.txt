@@ -1,0 +1,6 @@
+Find all the lines that contain the string 'strato' in the file
+/usr/share/rhcsa/wordlist and write all of those lines, in their original
+order, into the file /root/lines.txt.
+
+/root/lines.txt must contain ONLY the matching lines (no blank lines), and
+each line must be an exact copy of the corresponding source line.

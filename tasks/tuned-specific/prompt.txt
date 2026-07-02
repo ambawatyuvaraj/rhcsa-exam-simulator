@@ -1,0 +1,2 @@
+Using tuned, make {{PROF}} the active tuning profile for this system. Set this
+specific profile (do not simply apply the auto-recommended one).

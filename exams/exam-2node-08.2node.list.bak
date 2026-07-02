@@ -1,0 +1,46 @@
+# RHCSA two-node exam 08 — a faithful reproduction of the "Feb 2026 DUMPS RHCSA EX200"
+# paper (25 questions), adapted to this simulator's two-VM setup.
+# format: "<node> <task-id>"   (node1 = servera/system1, node2 = serverb/system2)
+# Trailing "# Qn" maps each line to the dump question; the parser ignores it.
+#
+# Like the dump: servera (node1) is the "given" box that also runs the walhalla
+# containers + the compute/find/grep/tar/LVM work; serverb (node2) is the system
+# you RESET (root password first) and then configure (networking, repo, NTP,
+# autofs, users, ACL, sudo, umask, swap).
+#
+# All 25 tasks are self-contained on their own node (the dump's "other system"
+# repo/NTP/NFS are given infrastructure, so the single-node variants are used:
+# repo-config, chrony-iburst, autofs-nfs) — nothing depends on the peer, so
+# solving with the seeded values cannot break the other node.
+# Disk budget (2 spare disks/VM): node1 = lvm-create + lvm-resize (2 disks),
+# node2 = swap-partition (1 disk). The per-task disk-claim system keeps them
+# on distinct devices.
+
+# ---- node1 : servera — containers (walhalla) + compute + LVM ----
+node1 container-build      # Q24  build a container image from a Containerfile
+node1 container-service    # Q25  rootless container as a systemd user service
+node1 selinux-port         # Q15  web server on non-standard port 82
+node1 grep-string          # Q8   copy matching lines to a file
+node1 grep-invert          # Q14  copy (un)commented lines of a file
+node1 find-files           # Q10  find files by owner and copy them
+node1 find-name-type       # Q13  find files by name/type into a file
+node1 find-size            # Q19  find files under a size and copy them
+node1 tar-bzip2            # Q9   bzip2-compressed tar archive
+node1 tuning-profile       # Q12  set the recommended tuned profile
+node1 lvm-create           # Q23  create a logical volume (disk)
+node1 lvm-resize           # Q21  resize a logical volume (disk)
+
+# ---- node2 : serverb — reset, then configure the system ----
+node2 root-password        # Q1   ALWAYS FIRST on node2 — reset the lost root password (console boot-interruption)
+node2 network-config       # Q2   configure networking
+node2 repo-config          # Q3   configure a yum/dnf repository
+node2 chrony-iburst        # Q11  NTP client (pool ... iburst)
+node2 autofs-nfs           # Q20  automount a home directory with autofs
+node2 users-groups         # Q4   create users, group and memberships
+node2 user-uid             # Q6   create a user with a specific UID
+node2 collaborative-dir    # Q5   collaborative (set-GID) directory
+node2 cron-job             # Q7   scheduled cron job
+node2 acl-permissions      # Q16  POSIX ACLs on a file
+node2 sudo-nopasswd        # Q17  passwordless sudo for a group
+node2 umask-default        # Q18  per-user umask
+node2 swap-partition       # Q22  add a swap partition (disk)

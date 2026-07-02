@@ -1,0 +1,5 @@
+A NetworkManager connection named rhcsart (bound to interface rhcsart)
+exists on this system.
+
+Add a static IPv4 route to the network {{NET}} via gateway {{GW}}
+on connection rhcsart.

@@ -1,0 +1,7 @@
+Add an additional 512 MiB of swap space to this system, using a new partition
+on the spare block device attached to this machine (identify it with `lsblk`
+— it is the unused disk that has no partitions/filesystems).
+
+  * The new swap must be active now and must be enabled automatically at
+    every boot.
+  * Do NOT remove or alter any existing swap.

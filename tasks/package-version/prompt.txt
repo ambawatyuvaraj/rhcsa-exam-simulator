@@ -1,0 +1,2 @@
+Ensure the software package {{PKG}} (any version available from the configured
+repositories) is installed on this system.

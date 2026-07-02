@@ -1,0 +1,3 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that takes one argument: a
+username. The script must use `id` to determine whether that account exists and
+print exactly `present` if it does, or `absent` if it does not.

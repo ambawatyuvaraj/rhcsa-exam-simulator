@@ -1,0 +1,3 @@
+Copy the file /opt/sedsrc.txt to /root/{{OUT}}, and in the copy replace every
+occurrence of the word `{{OLD}}` with `{{NEW}}`. The original /opt/sedsrc.txt
+must be left unchanged.

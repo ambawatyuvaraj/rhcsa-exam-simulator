@@ -1,0 +1,2 @@
+A spare interface rhcsa6 with NetworkManager connection `rhcsa6` exists.
+Configure it with the static IPv6 address {{IP6}}/64 (method manual).

@@ -1,0 +1,5 @@
+Umask
+
+configure permissions for user daffy such that
+  -> All newly created files by user daffy have permissions      rw-r-----
+  -> All newly created directories by user daffy have permissions drwxr-x---

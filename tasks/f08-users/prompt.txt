@@ -1,0 +1,8 @@
+create the following users, group and group membership
+
+  -> A group named manager
+  -> A user Natasha who belongs to manager group as a secondary group
+  -> A user harry who also belongs to manager group as a secondary group
+  -> A user Sarah who does not have an access to interactive shell and
+     is not a member of manager
+  -> password for all the user should be ratencot

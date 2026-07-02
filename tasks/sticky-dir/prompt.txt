@@ -1,0 +1,2 @@
+Create the directory /{{DIR}} that is world-writable but has the sticky bit set,
+so any user may create files in it yet only delete their own (mode 1777).

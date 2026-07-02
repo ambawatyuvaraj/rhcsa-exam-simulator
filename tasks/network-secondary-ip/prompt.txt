@@ -1,0 +1,5 @@
+A NetworkManager connection named rhcsa2ip (bound to interface rhcsa2ip)
+exists with an existing primary IPv4 address.
+
+Add a SECOND IPv4 address {{IP}}/24 to connection rhcsa2ip, keeping the
+existing primary address.

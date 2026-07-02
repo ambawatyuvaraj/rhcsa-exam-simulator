@@ -1,0 +1,3 @@
+On the spare block device attached to this machine, create a partition (at
+least 300 MiB), initialise it as an LVM physical volume, and create a volume
+group named {{VG}} whose physical-extent (PE) size is {{PE}} MiB.

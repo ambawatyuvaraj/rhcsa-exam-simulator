@@ -1,0 +1,9 @@
+This system exports an NFS share. Configure autofs to automatically mount a
+remote user's home directory as follows:
+
+  * NFS export (on this host):  localhost:/exports/rhome/remoteuser1
+  * It must be automounted on demand at:  /rhome/remoteuser1
+  * The mount must be read-write.
+  * The autofs service must be enabled and running.
+
+Test:  ls /rhome/remoteuser1     (you should see a README file)

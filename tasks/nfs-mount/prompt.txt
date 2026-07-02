@@ -1,0 +1,4 @@
+An NFS export is available on this machine at localhost:/exports/share2.
+
+Mount this NFS export read-write and persistently (via /etc/fstab, so it is
+mounted automatically at every boot) at /mnt/{{MP}}.

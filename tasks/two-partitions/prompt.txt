@@ -1,0 +1,5 @@
+On the spare block device attached to this machine (identify it with `lsblk`),
+create TWO partitions: the first of approximately {{A}} MiB and the second of
+approximately {{B}} MiB. A GPT label is acceptable.
+
+You do not need to format or mount the partitions.

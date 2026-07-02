@@ -1,0 +1,39 @@
+# RHCSA two-node exam 08 — faithful reproduction of "Feb 2026 DUMPS RHCSA EX200"
+# (25 questions). Values localized to this two-VM setup; questions + solutions
+# otherwise identical to the dump. f08-* = dump variants; reused as-is (already
+# dump-identical): root-password, repo-config, selinux-port, tuning-profile;
+# chrony-iburst carries the dump's `pool ... iburst`.
+# NOTE: the dump names BOTH LVM volume groups "wgroup" (Q21 wlogic + Q23 wshare),
+# so they are placed on different nodes (a VG name is unique per machine).
+# Disk claims (in list order): node1 f08-lvcreate->1st spare; node2 f08-swap->1st,
+# f08-lvresize->2nd.
+# format: "<node> <task-id>"   (trailing "# Qn" maps to the dump question)
+
+# ---- node1 : servera — containers (walhalla) + compute + LVM ----
+node1 f08-cbuild       # Q24  build a container image (monitor) as user walhalla
+node1 f08-cservice     # Q25  rootless container (ascii2pdf) as a systemd user service
+node1 selinux-port     # Q15  web server on non-standard port 82
+node1 f08-grep         # Q8   copy lines containing strato to /root/lines.txt
+node1 f08-grepcomment  # Q14  copy uncommented lines of /etc/sudoers to /root/list
+node1 f08-findowner    # Q10  find files owned by simone and copy them
+node1 f08-findconf     # Q13  find .conf files in /etc into /search
+node1 f08-findsize     # Q19  copy <5MB files from /usr/bin to /home/manage
+node1 f08-tar          # Q9   bzip2 tar archive of /usr/local
+node1 tuning-profile   # Q12  set the recommended tuned profile
+node1 f08-lvcreate     # Q23  create VG wgroup + LV wshare (vfat, /mnt/wshare)
+
+# ---- node2 : serverb — reset, then configure the system ----
+node2 root-password    # Q1   ALWAYS FIRST on node2 — reset the lost root password (console)
+node2 f08-network      # Q2   configure networking + hostname
+node2 repo-config      # Q3   configure the local yum repositories
+node2 chrony-iburst    # Q11  NTP client (pool <SRV> iburst)
+node2 f08-autofs       # Q20  automount remoteuser1's home with autofs
+node2 f08-users        # Q4   users + group manager + memberships (pw ratencot)
+node2 f08-uid          # Q6   create user jean with UID 4332
+node2 f08-collab       # Q5   collaborative (set-GID) directory /home/contrib
+node2 f08-cron         # Q7   cron job for natasha at 14:23 (echo hiya)
+node2 f08-acl          # Q16  POSIX ACLs on /var/tmp/fstab (harry/natasha)
+node2 f08-sudo         # Q17  passwordless sudo for group admin
+node2 f08-umask        # Q18  per-user umask 027 for daffy
+node2 f08-swap         # Q22  add a 512 MiB swap partition (claims 1st spare disk)
+node2 f08-lvresize     # Q21  extend LV wgroup/wlogic by 500 MiB (claims 2nd spare disk)

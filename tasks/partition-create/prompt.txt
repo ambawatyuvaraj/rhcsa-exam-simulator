@@ -1,0 +1,4 @@
+On the spare block device attached to this machine (identify it with `lsblk`
+— it is the unused disk with no partitions/filesystems), create a new partition
+of approximately {{SZ}} MiB, format it with the ext4 filesystem, and mount it
+persistently (it must remain mounted across reboots) at /mnt/{{MP}}.

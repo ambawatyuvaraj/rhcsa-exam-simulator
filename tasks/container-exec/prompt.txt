@@ -1,0 +1,3 @@
+A detached container named {{CN}} (from localhost/rhcsa-app:latest) is already
+running. Execute the command `cat /etc/os-release` INSIDE the running container
+{{CN}} and save its output to the file /root/{{OUT}} on the host.

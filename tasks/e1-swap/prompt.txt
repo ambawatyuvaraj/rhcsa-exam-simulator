@@ -1,0 +1,5 @@
+Create a swap partition
+
+On the spare disk available to this system, create a new partition of 512 MiB
+and format it as swap. Activate the swap space and ensure it is enabled
+automatically at every boot.

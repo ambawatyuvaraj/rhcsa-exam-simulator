@@ -1,0 +1,18 @@
+# RHCSA simulator — Exam set 03 (storage task: lvm-resize)
+network-config
+repo-config
+selinux-port
+collaborative-dir
+user-uid
+cron-job
+chrony-ntp
+autofs-nfs
+find-files
+grep-string
+script-finder
+container-service
+sudo-nopasswd
+acl-permissions
+lvm-resize
+tuning-profile
+boot-target

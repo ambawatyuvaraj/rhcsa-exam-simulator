@@ -1,0 +1,4 @@
+locate and copy
+
+locate all files owned by user simone and place a copy of them in the
+/root/found directory.

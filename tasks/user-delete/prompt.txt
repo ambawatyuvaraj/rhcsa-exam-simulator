@@ -1,0 +1,1 @@
+Delete the user {{U}} and remove their home directory.

@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local build/runtime artifacts (provisioned at install/run time)
+assets/repo/
+assets/*.tar
+*.log
+*.tmp

@@ -1,0 +1,5 @@
+Configure this system to synchronise its time from the NTP server:
+
+  time.example.com   (use the iburst option)
+
+The chronyd service must be enabled and running.

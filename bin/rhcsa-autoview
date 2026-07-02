@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# GNOME autostart helper: after a reboot-grade, open the exam REPORT in the
+# browser, once per fresh grade. Runs inside the student's graphical session so
+# DISPLAY/WAYLAND/DBUS are set correctly (a root service cannot do this).
+#
+# A reboot-grade writes report-pending.flag (in-flight) and, when finished,
+# report.html + report-ready.flag (and clears pending). The two-node grade can
+# take ~2 min after boot (40s timer + waiting for the peer), so if we run before
+# it finishes we WAIT for the report instead of giving up — that race is exactly
+# why the report never opened on login.
+ready=/var/lib/rhcsa-sim/report-ready.flag
+pending=/var/lib/rhcsa-sim/report-pending.flag
+rep=/var/lib/rhcsa-sim/report.html
+seen="$HOME/.rhcsa-report-seen"
+log="$HOME/.rhcsa-autoview.log"
+
+# Nothing to do unless a report is ready OR a reboot-grade is in flight.
+[ -f "$ready" ] || [ -f "$pending" ] || exit 0
+
+# Need a graphical session to open a browser; otherwise leave the flags untouched
+# so the next graphical login retries (never mark "seen" without opening).
+[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ] || { echo "$(date): no display yet; retry next login" >>"$log" 2>/dev/null; exit 0; }
+
+# Grade still running (pending set, ready not yet)? Wait for it — up to ~7 min.
+if [ ! -f "$ready" ]; then
+  echo "$(date): reboot-grade in flight; waiting for the report..." >>"$log" 2>/dev/null
+  for i in $(seq 1 105); do [ -f "$ready" ] && break; sleep 4; done
+fi
+[ -f "$ready" ] || { echo "$(date): report never became ready" >>"$log" 2>/dev/null; exit 0; }
+
+# Open only once per fresh grade (report-ready.flag mtime is refreshed each grade).
+[ -f "$seen" ] && [ "$seen" -nt "$ready" ] && exit 0
+
+# Wait for the HTML to land, then open it.
+for i in $(seq 1 30); do [ -f "$rep" ] && break; sleep 2; done
+[ -f "$rep" ] || { echo "$(date): report.html missing" >>"$log" 2>/dev/null; exit 0; }
+url="file://$rep"
+opened=0
+if command -v xdg-open >/dev/null 2>&1 && xdg-open "$url" >>"$log" 2>&1; then
+  opened=1
+elif command -v firefox >/dev/null 2>&1; then
+  setsid firefox "$url" >>"$log" 2>&1 & opened=1
+elif command -v gio >/dev/null 2>&1; then
+  gio open "$url" >>"$log" 2>&1 && opened=1
+fi
+echo "$(date): autoview opened=$opened url=$url" >>"$log" 2>/dev/null
+[ "$opened" = 1 ] && touch "$seen"
+exit 0

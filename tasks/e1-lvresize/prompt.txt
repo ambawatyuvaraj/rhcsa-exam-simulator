@@ -1,0 +1,5 @@
+Resize an LVM logical volume
+
+Extend the logical volume database in the volume group datastore so that it has
+a total of 100 extents, and grow its filesystem to use the additional space.
+Do not lose the existing data on the volume.

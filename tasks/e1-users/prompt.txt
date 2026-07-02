@@ -1,0 +1,3 @@
+Create the group admin. Create users harry and natasha and make them members of admin. Create user sarah with a non-interactive shell (/sbin/nologin). Set the password of harry, natasha and sarah to 123.
+
+Note: if an account listed here already exists, ensure it meets the stated requirements (you do not need to recreate it).

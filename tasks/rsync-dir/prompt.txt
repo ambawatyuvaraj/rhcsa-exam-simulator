@@ -1,0 +1,2 @@
+Use rsync to copy the directory /opt/rsrc (and its full contents) into {{DEST}},
+so that {{DEST}}/rsrc becomes an exact copy of /opt/rsrc.

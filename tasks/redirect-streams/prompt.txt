@@ -1,0 +1,5 @@
+Append the kernel release (the output of `uname -r`) to the file /root/{{F1}}.
+
+Then run the command `ls /nonexistent-$$` and redirect its standard ERROR
+output to /root/{{F2}}. The standard output of that command must NOT be written
+to /root/{{F2}}.

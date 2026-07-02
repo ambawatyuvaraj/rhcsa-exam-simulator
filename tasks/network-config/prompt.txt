@@ -1,0 +1,13 @@
+A spare network interface named rhcsa0 is present on this system.
+
+Create a NetworkManager connection named rhcsa0 (bound to interface rhcsa0)
+with the following static IPv4 configuration, and make sure it starts
+automatically:
+
+  IPv4 address : 172.25.250.100/24
+  Gateway      : 172.25.250.254
+  DNS server   : 172.25.250.254
+  Method       : manual
+
+(This configures a dedicated test interface only — it never touches the
+interface you are connected through, so it is safe to run on any node.)

@@ -1,0 +1,5 @@
+Start a background process by running `sleep 7000` such that it is identifiable
+by the string {{MARK}} in its command line and runs with a nice value of {{NICE}}.
+
+(Hint: `nice -n {{NICE}} ...`, and you can tag it, e.g.
+`bash -c 'exec -a {{MARK}} sleep 7000'`.)

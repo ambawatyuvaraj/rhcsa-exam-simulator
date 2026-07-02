@@ -1,0 +1,5 @@
+A tree of files and directories exists under /opt/ntsrc.
+
+Write the full path of every regular file under /opt/ntsrc whose name ends in
+.{{EXT}} into the file /root/{{OUT}}, one path per line. Directories (even if
+their name ends in .{{EXT}}) must not be included.

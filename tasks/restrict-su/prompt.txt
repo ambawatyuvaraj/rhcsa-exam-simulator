@@ -1,0 +1,3 @@
+Restrict use of the su command so that ONLY members of the wheel group may use
+su to become another user (root). Enable the pam_wheel.so check in
+/etc/pam.d/su.

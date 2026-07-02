@@ -1,0 +1,4 @@
+A NetworkManager connection named rhcsaauto (bound to interface rhcsaauto)
+exists and is currently set to autoconnect on boot.
+
+Configure connection rhcsaauto so that it does NOT autoconnect on boot.

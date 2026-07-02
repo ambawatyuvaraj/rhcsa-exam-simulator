@@ -1,0 +1,2 @@
+Mask the {{SVC}} service so that it cannot be started, either manually or as a
+dependency of another unit.

@@ -1,0 +1,3 @@
+One or more systemd units have entered the failed state. Write the list of
+currently failed units to /root/{{OUT}} (one per line is fine; the output of
+the command that lists failed units is acceptable).

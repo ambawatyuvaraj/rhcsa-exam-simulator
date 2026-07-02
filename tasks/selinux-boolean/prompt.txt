@@ -1,0 +1,2 @@
+Persistently enable the SELinux boolean {{SBOOL}} so that the setting survives
+a reboot.

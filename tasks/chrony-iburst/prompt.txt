@@ -1,0 +1,6 @@
+Configure this system to synchronise its time from the NTP server:
+
+  {{SRV}}
+
+Use the iburst option on the server line, and make sure the chronyd service is
+enabled and running.

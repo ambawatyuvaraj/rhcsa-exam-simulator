@@ -1,0 +1,2 @@
+Find all files on the system owned by the user jacques and copy them into the
+directory /root/findfiles (create it first).

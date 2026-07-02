@@ -1,0 +1,2 @@
+A container named {{CN}} (from localhost/rhcsa-app:latest) exists but is
+currently stopped. Start the container {{CN}} so that it is running again.

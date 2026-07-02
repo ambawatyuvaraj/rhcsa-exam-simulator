@@ -1,0 +1,3 @@
+Configure the SSH server to ALSO listen on TCP port {{PORT}} (in addition to
+port 22). You must add the port to the sshd configuration AND add the SELinux
+port label so the ssh_port_t type covers TCP port {{PORT}}.

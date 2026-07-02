@@ -1,0 +1,3 @@
+Create an executable shell script at /usr/local/bin/mysearch that finds every
+file under /usr/share smaller than 1M and copies it into /root/myfiles. Create
+/root/myfiles and run the script.

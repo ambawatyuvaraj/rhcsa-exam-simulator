@@ -1,0 +1,3 @@
+On the directory /{{DIR}}, set a DEFAULT ACL granting the group {{G}} rwx
+permissions, so that any new file or subdirectory created inside it
+automatically inherits rwx access for group {{G}}.

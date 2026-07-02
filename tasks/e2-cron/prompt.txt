@@ -1,0 +1,2 @@
+Configure a cron job that runs `logger "EX200 Testing"` every three minutes as
+the user harry.

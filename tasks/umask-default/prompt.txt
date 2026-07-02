@@ -1,0 +1,1 @@
+Configure the default umask for user {{U}} to {{UM}} (so new shells for that user use it).

@@ -1,0 +1,2 @@
+Create a tar archive named /root/backup.tar.gz that contains the contents of
+the /etc directory. The archive must be compressed using gzip.

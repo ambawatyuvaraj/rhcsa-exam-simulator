@@ -1,0 +1,2 @@
+From the current boot's systemd journal, save every entry of priority err (and
+more severe) into the file /root/{{OUT}}.

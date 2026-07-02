@@ -1,0 +1,1 @@
+Configure user natasha so her default umask is 277.

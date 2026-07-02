@@ -1,0 +1,4 @@
+The first partition on the spare disk is about 200 MiB, holds an ext4
+filesystem, and is mounted at /mnt/{{MP}}. There is unallocated free space
+after it on the disk. Grow BOTH the partition AND its ext4 filesystem to
+approximately 400 MiB so that /mnt/{{MP}} reports the larger capacity.

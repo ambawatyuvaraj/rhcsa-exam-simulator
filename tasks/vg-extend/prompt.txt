@@ -1,0 +1,4 @@
+A volume group named {{VG}} already exists on the spare block device, built on
+a single partition. Create a SECOND partition on that same spare disk, prepare
+it for LVM, and extend the volume group {{VG}} onto it so that {{VG}} spans two
+physical volumes.

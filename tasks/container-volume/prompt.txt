@@ -1,0 +1,3 @@
+Create a podman named volume {{VOL}}, then run a detached (background)
+container named {{CN}} from the image localhost/rhcsa-app:latest that mounts
+the volume {{VOL}} at /data inside the container.

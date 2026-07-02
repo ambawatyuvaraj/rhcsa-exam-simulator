@@ -1,0 +1,3 @@
+Create a PERSISTENT SELinux file-context EQUIVALENCE so that {{DST}} is labeled
+with the same contexts as {{SRC}}, then apply it so existing files under {{DST}}
+are relabeled.

@@ -1,0 +1,2 @@
+Search the file /etc/passwd for all lines that contain the string 'home' and
+redirect the output to /root/search.txt.

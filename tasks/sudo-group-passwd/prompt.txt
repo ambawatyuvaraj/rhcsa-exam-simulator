@@ -1,0 +1,1 @@
+Grant members of the group {{G}} full sudo access (the ability to run any command as any user). A password MUST still be required when they use sudo.

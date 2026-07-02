@@ -1,0 +1,2 @@
+Map the Linux user {{U}} to the SELinux user staff_u, so that new logins for
+{{U}} run in the staff_u context.

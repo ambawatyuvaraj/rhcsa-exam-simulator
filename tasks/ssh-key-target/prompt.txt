@@ -1,0 +1,8 @@
+This system is node1.example.com. Provide a login account that the peer node
+(node2.example.com) will use to install its SSH key, so the peer can log in
+here without a password.
+
+  * Create a user named  deploy  with a home directory.
+  * Set deploy's password to  Redhat123  — the peer uses it ONCE with
+    ssh-copy-id to install its key (after that, logins are passwordless).
+  * Ensure the SSH service is running so the peer can connect.

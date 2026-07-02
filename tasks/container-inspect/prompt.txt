@@ -1,0 +1,2 @@
+Inspect the image localhost/rhcsa-app:latest and save its full image ID (as
+shown by `podman image inspect`) into the file /root/{{OUTF}}.

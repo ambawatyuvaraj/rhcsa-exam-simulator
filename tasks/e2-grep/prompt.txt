@@ -1,0 +1,2 @@
+Search the file /usr/share/xml/iso-codes/iso_639_3.xml for all lines that
+contain the string 'ng' and redirect the output to /root/list.

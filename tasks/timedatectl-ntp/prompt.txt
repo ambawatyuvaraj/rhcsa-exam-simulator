@@ -1,0 +1,2 @@
+Enable automatic NTP time synchronisation on this system using the
+`timedatectl` command, so that `timedatectl` reports NTP service as active.

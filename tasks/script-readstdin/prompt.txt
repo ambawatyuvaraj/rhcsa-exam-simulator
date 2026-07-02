@@ -1,0 +1,4 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that reads ONE line from
+standard input and prints it back converted to UPPERCASE.
+
+For example, `echo hello | /usr/local/bin/{{SCRIPT}}` must print `HELLO`.

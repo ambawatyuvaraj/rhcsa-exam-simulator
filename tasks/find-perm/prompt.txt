@@ -1,0 +1,5 @@
+Several files exist under /opt/permsrc with various permissions.
+
+Find every regular file under /opt/permsrc whose permission is exactly {{MODE}}
+(octal), and copy each of those files into the directory /root/{{OUT}}
+(create the directory if needed). Do not copy files with any other permission.

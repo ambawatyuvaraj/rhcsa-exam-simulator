@@ -1,0 +1,3 @@
+Copy the file /etc/hostname to /root/{{OUTF}} (any secure copy method such as
+scp from localhost is acceptable). The copy must be byte-identical to
+/etc/hostname.

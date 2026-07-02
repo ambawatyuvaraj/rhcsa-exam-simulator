@@ -1,0 +1,5 @@
+The logical volume {{LV}} in volume group {{VG}} holds an XFS filesystem mounted
+at /mnt/{{MP}}. It is currently about 256 MiB and nearly full.
+
+Grow the logical volume AND its XFS filesystem to approximately 512 MiB. The
+filesystem must remain mounted and usable at /mnt/{{MP}}.

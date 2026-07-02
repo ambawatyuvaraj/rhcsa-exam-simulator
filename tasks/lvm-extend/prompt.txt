@@ -1,0 +1,6 @@
+A logical volume named lvext (in volume group vgext) is mounted at /mnt/lvext
+and contains data. Extend the logical volume lvext, AND its filesystem, to
+600 MiB without losing the existing data.
+
+Note: an exact size is rarely possible — any size between 580 MiB and 620 MiB
+is acceptable.

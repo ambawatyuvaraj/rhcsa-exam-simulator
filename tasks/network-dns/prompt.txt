@@ -1,0 +1,4 @@
+A NetworkManager connection named rhcsadns (bound to interface rhcsadns)
+exists on this system.
+
+Set the IPv4 DNS servers of connection rhcsadns to {{DNS1}} and {{DNS2}}.

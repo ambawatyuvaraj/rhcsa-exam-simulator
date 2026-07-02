@@ -1,0 +1,9 @@
+This system is node1.example.com. Configure chrony on this node to SERVE time
+to the local network so the peer node (node2.example.com) can synchronise
+from it.
+
+  * Allow NTP clients in the  192.168.0.0/16  range to use this server.
+  * Act as a local stratum source (so this node can serve time even without
+    an upstream reference).
+  * The chronyd service must be enabled and running, and the firewall must
+    permit NTP.

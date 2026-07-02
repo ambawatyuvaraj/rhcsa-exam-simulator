@@ -1,0 +1,4 @@
+An ext4 filesystem (currently with no label) exists on the first partition of
+the spare disk.
+
+Set its filesystem label to {{LBL}} WITHOUT reformatting the filesystem.

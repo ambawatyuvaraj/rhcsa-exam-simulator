@@ -1,0 +1,2 @@
+Add a static hostname resolution entry so that the name {{HN}} resolves to
+{{IP}} (via /etc/hosts).

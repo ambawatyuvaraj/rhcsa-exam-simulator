@@ -1,0 +1,1 @@
+timedatectl set-ntp true

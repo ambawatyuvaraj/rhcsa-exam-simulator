@@ -1,0 +1,3 @@
+Using scp, copy the file /etc/os-release from the remote account
+root@localhost into the local file /root/{{OUT}}. The copied file must be
+identical to /etc/os-release.

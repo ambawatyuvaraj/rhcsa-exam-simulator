@@ -1,0 +1,7 @@
+Create an executable script /usr/local/bin/{{SCRIPT}} that requires exactly two
+arguments.
+
+  - If it is NOT called with exactly two arguments, it must print a usage
+    message beginning with `usage:` to STDERR and exit with a non-zero status.
+  - If it IS called with exactly two arguments, it must print `ok` to STDOUT and
+    exit with status 0.

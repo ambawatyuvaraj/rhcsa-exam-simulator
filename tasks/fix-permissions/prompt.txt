@@ -1,0 +1,4 @@
+The file {{TGT}} has broken permissions and ownership.
+
+Set its mode (permission bits) to {{MODE}}, and set both its owner and its group
+to root.

@@ -1,0 +1,2 @@
+The {{SVC}} service is currently running and enabled at boot. Stop it now and
+ensure it does not start automatically at the next boot.

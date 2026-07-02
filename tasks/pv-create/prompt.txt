@@ -1,0 +1,4 @@
+On the spare block device attached to this machine, create a single partition
+(at least 300 MiB) and initialise that partition as an LVM physical volume.
+
+You do not need to create a volume group or logical volume.

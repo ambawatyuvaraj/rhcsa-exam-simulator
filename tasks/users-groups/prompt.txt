@@ -1,0 +1,14 @@
+Create the following users, groups, and group memberships:
+
+  * A group named sysmgrs.
+
+  * A user named natasha, who belongs to the sysmgrs group as a
+    secondary (supplementary) group.
+
+  * A user named harry, who also belongs to the sysmgrs group as a
+    secondary (supplementary) group.
+
+  * A user named sarah, who does NOT have access to an interactive
+    shell on the system, and who is NOT a member of the sysmgrs group.
+
+  * The password for natasha, harry, and sarah must be:  flectrags

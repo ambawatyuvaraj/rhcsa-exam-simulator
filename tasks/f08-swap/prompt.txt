@@ -1,0 +1,5 @@
+add an additional swap partition of 512 MiB to your system. The swap partition
+should automatically mount when your system boots.
+
+Note: Do not remove or otherwise alter any existing swap partitions on your
+system.

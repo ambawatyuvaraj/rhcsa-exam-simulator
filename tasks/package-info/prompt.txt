@@ -1,0 +1,3 @@
+Find the installed version of the package {{PKG}} and write ONLY that version
+string (the version, with no name, release or architecture) to the file
+/root/{{OUT}}.

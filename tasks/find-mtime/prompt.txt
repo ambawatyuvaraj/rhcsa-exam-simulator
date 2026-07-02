@@ -1,0 +1,5 @@
+A mix of recently-modified and old files exist under /opt/mtsrc.
+
+Find every regular file under /opt/mtsrc that was modified within the last
+{{DAYS}} days, and copy each into the directory /root/{{OUT}} (create it if
+needed). Do not copy files older than that.

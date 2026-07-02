@@ -1,0 +1,2 @@
+Configure the system (faillock) so that an account is locked after {{N}} failed
+login attempts. Set deny={{N}} in /etc/security/faillock.conf.

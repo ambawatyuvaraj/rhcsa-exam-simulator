@@ -1,0 +1,36 @@
+# RHCSA two-node exam 03 — faithful reproduction of "RHCSA EXAM v9.3" (rchsa_9_2.pdf).
+# node1 = serverb.lab.example.com (the system you configure: 18 tasks).
+# node2 = servera.lab.example.com (root password reset first, then storage: 6 tasks).
+# Values follow the paper; only setup-specifics are adapted to this offline 2-VM lab
+# (IPs on the isolated dummy NIC rhcsa0; repos point at the local DVD; the NFS source
+# is localhost; node2 swap+LVM share ONE disk like the key's /dev/vdb). Every task maps
+# to a real RHCSA EX200 (RHEL 9) objective — no server-side / out-of-scope tasks.
+# format: "<node> <task-id>"   (trailing "# Qn" maps to the paper question)
+
+# ---- node1 : serverb — 18 tasks ----
+node1 e3-network       # Q1   hostname serverb.lab.example.com + static IP 172.25.250.11
+node1 e1-repo          # Q2   /etc/yum.repos.d (BaseOS + AppStream)
+node1 selinux-port     # Q3   web server on non-standard port 82 (SELinux)
+node1 e1-users         # Q4   group admin; harry+natasha in admin; sarah nologin; pw redhat
+node1 e3-collab        # Q5   collaborative set-GID dir /common/shared (2770, group admin)
+node1 e1-autofs        # Q6   automount production5's home via autofs (/localhome/production5)
+node1 e1-cron          # Q7   cron job for harry at 12:30 (echo hello)
+node1 chrony-iburst    # Q8   NTP client of classroom.example.com
+node1 e1-findowner     # Q9   copy files owned by sarah -> /root/find.user
+node1 e1-grephome      # Q10  grep "home" /etc/passwd -> /root/search.txt
+node1 e1-uid           # Q11  create user alies with UID 1326
+node1 e3-tar           # Q12  /var/tmp -> /root/test.tar.gz (gzip) AND /root/test.tar.bz (bzip2)
+node1 e3-cservice      # Q13  rootless container monitor as a systemd service (student)
+node1 e3-umask         # Q14.1 natasha default umask 0227 (files r--r-----, dirs r-xr-x---)
+node1 e1-passmax       # Q14.2 PASS_MAX_DAYS 20 in /etc/login.defs
+node1 f08-sudo         # Q14.3 passwordless sudo for group admin
+node1 e1-envvar        # Q14.4 alies login env: RHCSA="Welcome to Advantage Pro"
+node1 e3-script        # Q14.5 /usr/local/bin/myfind copies /usr/share 400k-800k files
+
+# ---- node2 : servera — 6 tasks ----
+node2 root-password    # Q1   ALWAYS FIRST on node2 — reset the lost root password (console)
+node2 e1-repo2         # Q2   /etc/yum.repos.d (BaseOS + AppStream)
+node2 e3-swap          # Q3   512 MiB swap partition (shared disk)
+node2 e3-lvm           # Q4   VG datastore (8M PE) + LV database (50 ext, ext3, /mnt/education)
+node2 e3-lvresize      # Q5   resize database to 500 MiB
+node2 tuning-profile   # Q6   set the recommended tuned profile

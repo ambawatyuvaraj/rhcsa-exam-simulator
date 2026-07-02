@@ -1,0 +1,2 @@
+Write the list of systemd timer units on this system to /root/{{OUT}} (the
+output of the command that lists timers is acceptable).

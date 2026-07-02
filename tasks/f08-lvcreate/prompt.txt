@@ -1,0 +1,11 @@
+create a logical volume
+
+create a new logical volume according to the following requirements:
+
+  -> The logical volume is named wshare and belongs to the wgroup volume
+     group and has a size of 100 extents.
+  -> The wgroup volume group should have an extent size of 8 MiB.
+  -> Format the new logical volume with the vfat filesystem.
+
+Note: the logical volume should be automatically mounted under /mnt/wshare
+at system boot time.

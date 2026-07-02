@@ -1,0 +1,9 @@
+This system is node1.example.com. Serve a yum/dnf package repository over HTTP
+so the peer node (node2.example.com) can install packages from it.
+
+  * The repository must be reachable at:  http://node1.example.com/pkgrepo
+  * Its document-root content lives under:  /var/www/html/pkgrepo
+    (generate the repository metadata there).
+  * The httpd service must start at boot, and the firewall must permit HTTP.
+
+The peer node will configure a dnf repo pointing at this URL.

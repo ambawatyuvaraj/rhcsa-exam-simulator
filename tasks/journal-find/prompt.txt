@@ -1,0 +1,2 @@
+Save all systemd journal entries for the chronyd service (current boot) into the
+file /root/{{OUTF}}.

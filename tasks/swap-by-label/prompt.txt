@@ -1,0 +1,4 @@
+On the spare block device attached to this machine, create a partition of at
+least 256 MiB, initialise it as swap space with the label {{LBL}}, enable the
+swap, and make it persistent across reboots by referencing it in /etc/fstab by
+its LABEL (use LABEL={{LBL}} in the fstab entry).

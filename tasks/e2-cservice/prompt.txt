@@ -1,0 +1,10 @@
+Configure a container as a service
+
+As the user wallah, configure a container to run as a service:
+  -> use the image watch:latest (already loaded in wallah's local image store)
+  -> the container must start automatically with the system, with no manual login
+  -> the service must be named container-ascii2pdf
+  -> mount the local directory /opt/files    under /opt/dir1 in the container
+  -> mount the local directory /opt/progress under /opt/dir2 in the container
+
+Log in as wallah over SSH:  ssh wallah@node1.example.com  (password: redhat)

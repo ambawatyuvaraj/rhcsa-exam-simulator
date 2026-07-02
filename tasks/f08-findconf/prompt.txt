@@ -1,0 +1,4 @@
+find and copy file name
+
+find files with the .conf extension in the /etc directory and place all
+those file names in the /search file.

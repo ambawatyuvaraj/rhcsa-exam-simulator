@@ -1,0 +1,4 @@
+The firewall currently allows the {{SVC}} service.
+
+Permanently REMOVE the {{SVC}} service from the firewall (runtime and
+permanent).

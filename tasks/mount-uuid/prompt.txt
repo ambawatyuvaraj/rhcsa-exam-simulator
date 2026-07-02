@@ -1,0 +1,6 @@
+A formatted ext4 partition already exists on the spare block device attached to
+this machine (identify it with `lsblk`/`blkid`). Mount it persistently (it must
+remain mounted across reboots) at /mnt/{{MP}}.
+
+The /etc/fstab entry MUST reference the filesystem by its UUID (UUID=...), not
+by its device name.

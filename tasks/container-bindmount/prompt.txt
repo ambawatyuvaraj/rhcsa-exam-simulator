@@ -1,0 +1,4 @@
+Run a detached (background) container named {{CN}} from the image
+localhost/rhcsa-app:latest that bind-mounts the host directory {{BDIR}} to
+/hostdata inside the container. The mount must be READ-ONLY, and use the :Z
+SELinux relabel option.

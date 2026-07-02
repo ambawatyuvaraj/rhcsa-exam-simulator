@@ -1,0 +1,4 @@
+The logical volume {{VG}}/{{LV}} is an ext4 filesystem mounted at /mnt/{{MP}}
+and currently sized about 500 MiB. It contains an important data file. Reduce
+both the logical volume AND its ext4 filesystem to approximately 300 MiB
+WITHOUT losing the existing data.

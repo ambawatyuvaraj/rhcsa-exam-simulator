@@ -1,0 +1,12 @@
+This system is node2.example.com. As root on this node, set up key-based SSH
+authentication so that root can log in to the peer node WITHOUT a password.
+
+  * Target:  deploy@node1.example.com  (the deploy account is provided on node1,
+    password Redhat123)
+  * Generate an SSH key pair for root if one does not already exist, then
+    install root's public key into deploy's authorized_keys on node1.
+    ssh-copy-id is the easy way — it asks ONCE for deploy's password (Redhat123),
+    NOT node1's root password.
+
+Test:  ssh deploy@node1.example.com   (must succeed without prompting for a
+password).

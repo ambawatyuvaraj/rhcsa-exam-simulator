@@ -1,0 +1,10 @@
+Configure this system to use the following two repositories. They already
+exist locally on this machine (offline):
+
+  Repository id : BaseOS
+    baseurl     : file:///opt/rhcsa-repo/BaseOS
+  Repository id : AppStream
+    baseurl     : file:///opt/rhcsa-repo/AppStream
+
+GPG signature checking must be disabled for both repositories, and both must
+be enabled.
