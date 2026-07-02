@@ -7,3 +7,4 @@ assets/repo/
 assets/*.tar
 *.log
 *.tmp
+*.bak

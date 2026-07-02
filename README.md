@@ -35,8 +35,8 @@ scored, per-task report.
 On a disposable RHEL 9 VM with the install DVD attached:
 
 ```bash
-git clone https://github.com/<user>/<repo>.git
-cd <repo>
+git clone https://github.com/ambawatyuvaraj/rhcsa-exam-simulator.git
+cd rhcsa-exam-simulator
 sudo ./install.sh        # installs the 'rhcsa-sim' CLI + configures the local DVD repo
 ```
 
