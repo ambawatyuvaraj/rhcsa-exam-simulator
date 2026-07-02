@@ -29,6 +29,8 @@ scored, per-task report.
 | ![command menu](docs/screenshots/menu.png) | ![exam paper](docs/screenshots/exam-paper.png) |
 | **Task detail — hint · solution · check** | **Category practice** |
 | ![task detail](docs/screenshots/task-detail.png) | ![category practice](docs/screenshots/practice-category.png) |
+| **VM control — manage node2 in two-node exams** | **Scored per-task report** |
+| ![vm control](docs/screenshots/vm-control.png) | ![graded report](docs/screenshots/graded-report.png) |
 
 ## Install
 
@@ -53,8 +55,35 @@ sudo rhcsa-sim reset             # wipe all changes back to a clean state
 ```
 
 More modes: `practice <category>` (drill one topic with hints), `mock <exam>`
-(aid-free rehearsal), `list` (all exams and tasks). Two-node exams
-(`exam-2node-*`) are driven from node1, which pairs and grades node2 for you.
+(aid-free rehearsal), `list` (all exams and tasks).
+
+## Single-node vs. two-node exams
+
+| | Single-node (`exam-01`…`05`) | Two-node (`exam-2node-01`…`08`) |
+|---|---|---|
+| Machines | one VM | two paired VMs — **node1** + **node2** |
+| Feels like | a focused drill | the real remote EX200 (two systems) |
+| Grading | `rhcsa-sim grade` on the VM | run once on **node1**; it grades node2 over SSH and prints one combined score |
+| Adds | — | cross-node tasks (key-based SSH, `rsync`), node2 root-password recovery, per-node task groups, the VM-control panel |
+
+### Set up two nodes
+
+Clone the VM (or build a second identical one), run `install.sh` on **both**, then pair them:
+
+```bash
+sudo rhcsa-sim node-setup --role node1 --peer <node2-ip>   # on node1
+sudo rhcsa-sim node-setup --role node2 --peer <node1-ip>   # on node2
+sudo rhcsa-sim doctor            # run on both — must be GREEN (controller channel OK)
+```
+
+### Practice a two-node exam — all from node1
+
+```bash
+sudo rhcsa-sim start exam-2node-01   # seeds BOTH nodes (node1 locally, node2 over SSH)
+sudo rhcsa-sim tui                   # paper shows both nodes' task groups + a VM panel for node2
+#   do node1 tasks here; for node2:  ssh student@node2.example.com  then  sudo -i
+sudo rhcsa-sim grade --reboot        # reboots + grades both, prints one combined /300 score
+```
 
 ## Requirements
 
