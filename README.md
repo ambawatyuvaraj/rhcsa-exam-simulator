@@ -76,6 +76,8 @@ sudo rhcsa-sim node-setup --role node2 --peer <node1-ip>   # on node2
 sudo rhcsa-sim doctor            # run on both — must be GREEN (controller channel OK)
 ```
 
+> Full walkthrough (root-SSH trust, spare disk, DVD, grading, reset): **[SETUP.md](SETUP.md)**.
+
 ### Practice a two-node exam — all from node1
 
 ```bash
