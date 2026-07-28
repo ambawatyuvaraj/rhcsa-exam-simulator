@@ -1,3 +1,4 @@
+# RHCSA_RHEL: 9   (this paper reproduces a RHEL 9 EX200 exam; contains containers/set-GID/MBR tasks that RHEL 10 objectives dropped)
 # RHCSA two-node exam 02 — faithful reproduction of "RHCSA 9.3" (rhcsa_9_3.pdf).
 # Node1 = tasks 1-15, Node2 = tasks 16-21 (exactly as the paper). Values are from
 # the answer key; only setup-specifics are adapted to this 2-VM offline lab (IPs

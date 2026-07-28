@@ -1,3 +1,4 @@
+# RHCSA_RHEL: 9   (this paper reproduces a RHEL 9 EX200 exam; contains containers/set-GID/MBR tasks that RHEL 10 objectives dropped)
 # RHCSA simulator — Exam set 03 (storage task: lvm-resize)
 network-config
 repo-config

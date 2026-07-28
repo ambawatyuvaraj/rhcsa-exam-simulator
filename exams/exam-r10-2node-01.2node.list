@@ -1,0 +1,31 @@
+# RHCSA_RHEL: 10
+# RHCSA 10 two-node exam 01. node1 = configure (22 tasks incl. Flatpak + timer);
+# node2 = reset root password first, then storage/tuned (6 tasks).
+# format: "<node> <task-id>"
+# ---- node1 ----
+node1 e1-network
+node1 e1-repo
+node1 flatpak-remote
+node1 flatpak-install
+node1 selinux-port
+node1 e1-users
+node1 e1-autofs
+node1 e1-cron
+node1 systemd-timer
+node1 chrony-iburst
+node1 e1-findowner
+node1 e1-grephome
+node1 e1-uid
+node1 e1-backup
+node1 e1-umask
+node1 e1-passmax
+node1 f08-sudo
+node1 e1-envvar
+node1 e1-script
+# ---- node2 ----
+node2 root-password
+node2 e1-repo2
+node2 e1-swap
+node2 e1-lvm
+node2 e1-lvresize
+node2 tuning-profile

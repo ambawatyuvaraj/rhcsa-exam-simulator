@@ -30,15 +30,26 @@ if [[ "${1:-}" == "--uninstall" ]]; then
   exit 0
 fi
 
-# ---- OS check --------------------------------------------------------------
+# ---- OS check + which RHCSA the exam content targets ------------------------
+# Auto-detected, never asked: RHEL 10 -> RHCSA 10 content, RHEL 9.x -> RHCSA 9.
+# Force with:  RHCSA_RHEL=10 ./install.sh
+RHCSA_RHEL="${RHCSA_RHEL:-}"
 if [[ -r /etc/os-release ]]; then
   . /etc/os-release
   case "${ID:-} ${ID_LIKE:-}" in
     *rhel*|*centos*|rocky*|almalinux*) :;;
-    *) yel "WARNING: ${PRETTY_NAME:-unknown} is not RHEL 9 family. Tasks assume RHEL 9.";;
+    *) yel "WARNING: ${PRETTY_NAME:-unknown} is not a RHEL family release. Tasks assume RHEL 9/10.";;
   esac
-  [[ "${VERSION_ID%%.*}" == "9" ]] || yel "WARNING: this is version ${VERSION_ID:-?}, RHCSA targets 9."
+  case "${VERSION_ID%%.*}" in
+    10) : "${RHCSA_RHEL:=10}";;
+    9)  : "${RHCSA_RHEL:=9}";;
+    *)  : "${RHCSA_RHEL:=9}"
+        yel "WARNING: version ${VERSION_ID:-?} is neither 9 nor 10 — installing the RHCSA $RHCSA_RHEL content set.";;
+  esac
 fi
+: "${RHCSA_RHEL:=9}"
+export RHCSA_RHEL
+grn "Detected ${PRETTY_NAME:-unknown} -> installing the RHCSA ${RHCSA_RHEL} content set."
 if command -v systemd-detect-virt >/dev/null 2>&1; then
   v="$(systemd-detect-virt || true)"
   [[ -n "$v" && "$v" != none ]] || yel "WARNING: could not confirm a VM. Use a DISPOSABLE machine — tasks are destructive."
@@ -133,8 +144,10 @@ fi
 if command -v podman >/dev/null 2>&1 && [[ ! -f "$PREFIX/assets/rhcsa-app.tar" ]]; then
   inf "Building container image asset (localhost/rhcsa-app:latest)..."
   bdir="$(mktemp -d)"
-  cat >"$bdir/Containerfile" <<'CF'
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+  # Match the base image to the host release (ubi10 on RHEL 10) so the image the
+  # container tasks run is the one the candidate would actually pull.
+  cat >"$bdir/Containerfile" <<CF
+FROM registry.access.redhat.com/ubi${RHCSA_RHEL}/ubi-minimal
 CMD ["sleep", "infinity"]
 CF
   if podman build -t localhost/rhcsa-app:latest "$bdir" >/dev/null 2>&1; then

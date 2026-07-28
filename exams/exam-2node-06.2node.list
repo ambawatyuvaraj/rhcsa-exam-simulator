@@ -1,3 +1,4 @@
+# RHCSA_RHEL: 9   (this paper reproduces a RHEL 9 EX200 exam; contains containers/set-GID/MBR tasks that RHEL 10 objectives dropped)
 # RHCSA two-node exam 06 — auto-composed; single-node tasks unique vs every other exam.
 # node1 = graphical workstation (servers + tasks); node2 = headless (clients + tasks).
 

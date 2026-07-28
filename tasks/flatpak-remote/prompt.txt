@@ -1,0 +1,9 @@
+A local Flatpak repository has been provided on this system at:
+
+  file://{{REPO_PATH}}
+
+Configure access to it: add a SYSTEM Flatpak remote named "{{REMOTE}}" that
+points at that repository. The repository is not signed, so disable GPG
+verification.
+
+Verify with:  flatpak remotes

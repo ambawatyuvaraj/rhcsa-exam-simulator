@@ -13,10 +13,11 @@ if ! vgs "$VG" >/dev/null 2>&1; then
   vgcreate "$VG" "$P" >/dev/null 2>&1
 fi
 if ! lvs "$VG/$LV" >/dev/null 2>&1; then
-  lvcreate -y -L 256M -n "$LV" "$VG" >/dev/null 2>&1
+  # 320M, not 256M: RHEL 10 mkfs.xfs refuses any XFS below 300 MiB (RHEL 9 accepts either).
+  lvcreate -y -L 320M -n "$LV" "$VG" >/dev/null 2>&1
   mkfs.xfs -f "/dev/$VG/$LV" >/dev/null 2>&1
 fi
 mkdir -p "/mnt/$MP"
 mountpoint -q "/mnt/$MP" || mount "/dev/$VG/$LV" "/mnt/$MP" 2>/dev/null
-echo "xfs-grow: $VG/$LV (256M XFS) mounted at /mnt/$MP"
+echo "xfs-grow: $VG/$LV (320M XFS) mounted at /mnt/$MP"
 exit 0

@@ -74,6 +74,10 @@ cmd_list() {
   for f in "$RHCSA_EXAMS"/*.list; do
     [[ -e "$f" ]] || continue
     local id; id="$(basename "$f" .list)"
+    # Only papers valid for THIS release: a paper written for the other RHCSA
+    # version would seed tasks the host cannot do and score against an
+    # unreachable total. Papers with no declaration are valid everywhere.
+    exam_rhel_ok "$id" || continue
     local n; n="$(read_exam "$id" | wc -l)"
     printf '  %-12s %s tasks\n' "$id" "$n"
   done
@@ -288,6 +292,12 @@ cmd_start() {
   done
   [[ "${_RHCSA_PRACTICE:-}" == 1 ]] && practice=1
   sel="${sel:-exam-01}"
+  # Refuse a paper written for the other RHCSA version rather than seeding it:
+  # its tasks would be filtered out by release, so the candidate would work
+  # against a total they cannot reach.
+  if ! exam_rhel_ok "$sel"; then
+    die "'$sel' is a RHCSA $(exam_rhel "$sel") paper, but this system is RHEL ${RHCSA_RHEL} (RHCSA ${RHCSA_RHEL} content). Run 'rhcsa-sim list' for the papers available here."
+  fi
   # SELF-CLEAN: always clear any previous session's task changes before seeding, so a
   # fresh exam never inherits leftovers (no need to remember 'reset' first). This runs
   # the same teardowns + deep clean as 'reset' (history is preserved).
@@ -318,7 +328,7 @@ cmd_start() {
     fi
   fi
   check_distro; local drc=$?
-  [[ $drc -eq 1 ]] && warn "Unsupported OS ($RHCSA_DISTRO). Tasks assume RHEL 9 family."
+  [[ $drc -eq 1 ]] && warn "Unsupported OS ($RHCSA_DISTRO). Tasks assume RHEL 9 or 10; using the RHCSA ${RHCSA_RHEL} content set."
   detect_virt || warn "Could not confirm this is a VM (virt=$RHCSA_VIRT). Running on bare metal is STRONGLY discouraged."
 
   if session_active; then
@@ -852,7 +862,7 @@ cmd_practice() {
   local dom="${1:-}"
   if [[ -z "$dom" ]]; then
     echo "usage: rhcsa-sim practice <category | exam | weak>"
-    echo "  categories : $RHCSA_CATEGORIES"
+    echo "  categories : $(available_categories)"
     echo "  weak       : tasks you failed recently or never tried"
     echo "  exam       : ANY exam name, WITH aids (single- or two-node; see 'rhcsa-sim list')"
     return 1
@@ -862,8 +872,14 @@ cmd_practice() {
   if [[ -r "$RHCSA_EXAMS/$dom.list" || -r "$RHCSA_EXAMS/$dom.2node.list" ]]; then
     _RHCSA_PRACTICE=1 cmd_start "$dom"; return
   fi
-  [[ "$dom" == weak || " $RHCSA_CATEGORIES " == *" $dom "* ]] \
-    || die "unknown '$dom'. Use a category ($RHCSA_CATEGORIES), 'weak', or an exam name (see 'rhcsa-sim list')."
+  if [[ "$dom" != weak ]] && ! category_available "$dom"; then
+    # Distinguish "no such category" from "that category is not part of this
+    # release's exam" — the latter is a correct, explainable state, not a typo.
+    if [[ " $RHCSA_CATEGORIES " == *" $dom "* ]]; then
+      die "'$dom' is not part of the RHCSA ${RHCSA_RHEL} exam (this system is RHEL ${RHCSA_RHEL}), so there are no $dom tasks to practise. Available: $(available_categories)"
+    fi
+    die "unknown '$dom'. Use a category ($(available_categories)), 'weak', or an exam name (see 'rhcsa-sim list')."
+  fi
   check_distro >/dev/null; detect_virt || warn "Not detected as a VM — only practice on a DISPOSABLE machine."
 
   local tasks=() t
@@ -917,7 +933,7 @@ cmd_study() {
   local t="${1:?usage: rhcsa-sim study TASK|CATEGORY}"
   # Category course mode: read EVERY task of one topic (prompt + solution),
   # sequentially — a guided reading course for that domain.
-  if [[ " $RHCSA_CATEGORIES " == *" $t "* ]]; then
+  if category_available "$t"; then
     _course_body() {
       local id n=0
       echo "STUDY COURSE — every '$t' task with its reference solution"
@@ -942,7 +958,7 @@ cmd_study() {
     if [[ -t 1 ]] && command -v less >/dev/null 2>&1; then _course_body | less -R; else _course_body; fi
     return 0
   fi
-  task_exists "$t" || die "unknown task or category: $t  (categories: $RHCSA_CATEGORIES)"
+  task_exists "$t" || die "unknown task or category: $t  (categories: $(available_categories))"
   load_meta "$t"
   hr; echo "${C_BOLD}$t — $TASK_TITLE${C_OFF}  [$TASK_DOMAIN, $TASK_POINTS pts]"; hr
   # Show the rendered prompt (use live-session params if present, else a sample).
@@ -1403,8 +1419,8 @@ cmd_mock() {     # full dress rehearsal: aid-free + logged for the readiness sco
 cmd_drill() {    # ONE random task against a short clock
   require_root drill
   local cat="${1:-}" secs="${RHCSA_DRILL_SECONDS:-420}" t
-  if [[ -n "$cat" && " $RHCSA_CATEGORIES " != *" $cat "* ]]; then
-    die "unknown category '$cat'. Choose one of: $RHCSA_CATEGORIES  (or no argument = any topic)"
+  if [[ -n "$cat" ]] && ! category_available "$cat"; then
+    die "unknown category '$cat'. Choose one of: $(available_categories)  (or no argument = any topic)"
   fi
   if [[ -n "$cat" ]]; then t="$(compose_domain "$cat" 50 | shuf -n1)"; else t="$(single_node_tasks | shuf -n1)"; fi
   [[ -n "$t" ]] || die "no task available to drill."
@@ -1541,8 +1557,8 @@ print(d.get("task",""), int(d.get("streak",0) or 0), int(d.get("round",0) or 0))
 cmd_troubleshoot() {  # rhcsa-sim troubleshoot [category]
   require_root troubleshoot
   local cat="${1:-}" t
-  if [[ -n "$cat" && " $RHCSA_CATEGORIES " != *" $cat "* ]]; then
-    die "unknown category '$cat'. Choose one of: $RHCSA_CATEGORIES  (or no argument = any topic)"
+  if [[ -n "$cat" ]] && ! category_available "$cat"; then
+    die "unknown category '$cat'. Choose one of: $(available_categories)  (or no argument = any topic)"
   fi
   _ensure_local_repo_mounted 2>/dev/null || true
   local cands=() x
@@ -1605,7 +1621,7 @@ cmd_doctor() {
   hr; echo "${C_BOLD}rhcsa-sim doctor — environment preflight${C_OFF}"; hr
 
   # 1. OS family / version
-  if check_distro; then _p "OS: ${RHCSA_DISTRO} (RHEL 9 family)"; else _w "OS: ${RHCSA_DISTRO:-unknown} — RHCSA targets RHEL 9; results may differ"; fi
+  if check_distro; then _p "OS: ${RHCSA_DISTRO} — serving the RHCSA ${RHCSA_RHEL} content set"; else _w "OS: ${RHCSA_DISTRO:-unknown} — RHCSA targets RHEL 9 or 10; using the RHCSA ${RHCSA_RHEL} content set, results may differ"; fi
 
   # 2. root
   if [[ ${EUID:-$(id -u)} -eq 0 ]]; then _p "running as root"; else _f "not root — run with sudo"; fi

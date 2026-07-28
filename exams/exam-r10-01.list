@@ -1,0 +1,20 @@
+# RHCSA_RHEL: 10
+# RHCSA 10 (EX200 on RHEL 10) — single-node exam set 01.
+# Built from the RHEL 10 objective set: containers and set-GID collaboration are
+# gone; Flatpak (Manage software) and systemd timer units are in.
+network-config
+repo-config
+flatpak-remote
+flatpak-install
+selinux-port
+users-groups
+cron-job
+systemd-timer
+autofs-nfs
+find-files
+tar-archive
+script-finder
+sudo-nopasswd
+lvm-create
+tuning-profile
+root-password

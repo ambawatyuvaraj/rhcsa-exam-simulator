@@ -11,7 +11,10 @@ it seeds, grades, and controls **node2** over SSH.
 
 ## Prerequisites
 
-- **Two disposable VMs**, both **RHEL 9** (or Rocky / AlmaLinux / CentOS Stream 9).
+- **Two disposable VMs**, both the **same RHEL version** — either RHEL 9 or
+  RHEL 10 (or Rocky / AlmaLinux / CentOS Stream 9|10). The simulator detects the
+  version and serves RHCSA 9 or RHCSA 10 automatically; both nodes must match so
+  the two-node paper is the same version on each.
   Building the second as a **clone** of the first is easiest.
 - Each VM: **~2 GB RAM** and **one blank spare disk** (e.g. `/dev/vdb`) for the
   storage tasks.

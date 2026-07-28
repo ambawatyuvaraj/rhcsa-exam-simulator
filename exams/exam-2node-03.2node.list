@@ -1,3 +1,4 @@
+# RHCSA_RHEL: 9   (this paper reproduces a RHEL 9 EX200 exam; contains containers/set-GID/MBR tasks that RHEL 10 objectives dropped)
 # RHCSA two-node exam 03 — faithful reproduction of "RHCSA EXAM v9.3" (rchsa_9_2.pdf).
 # node1 = serverb.lab.example.com (the system you configure: 18 tasks).
 # node2 = servera.lab.example.com (root password reset first, then storage: 6 tasks).

@@ -1,0 +1,30 @@
+# RHCSA_RHEL: 10
+# RHCSA 10 two-node exam 03 (e3-*/e1-* mix; containers/collab replaced by
+# Flatpak + timer + GPT partitioning). node1 = configure; node2 = storage/tuned.
+# ---- node1 ----
+node1 e3-network
+node1 e1-repo
+node1 flatpak-install
+node1 selinux-port
+node1 e1-users
+node1 partition-create
+node1 e1-autofs
+node1 e1-cron
+node1 systemd-timer
+node1 chrony-iburst
+node1 e1-findowner
+node1 e1-grephome
+node1 e1-uid
+node1 e3-tar
+node1 e3-umask
+node1 e1-passmax
+node1 f08-sudo
+node1 e1-envvar
+node1 e3-script
+# ---- node2 ----
+node2 root-password
+node2 e1-repo2
+node2 e3-swap
+node2 e3-lvm
+node2 e3-lvresize
+node2 tuning-profile

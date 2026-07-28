@@ -13,6 +13,15 @@ RHCSA_RESULTS="$RHCSA_STATE/results"
 RHCSA_REPORTS="$RHCSA_STATE/reports"
 RHCSA_SESSION="$RHCSA_STATE/session.json"
 
+# ---- Target RHCSA version --------------------------------------------------
+# The exam tracks the OS: RHEL 10 -> RHCSA 10 content, RHEL 9 -> RHCSA 9 content.
+# Detected once, here, from /etc/os-release so EVERY code path (tasks, solutions,
+# exams, install) sees the same answer with no user decision. Anything that is not
+# RHEL 10 falls back to 9 — that covers 9.3/9.4/9.x and RHEL-likes. Override for
+# authoring/testing:  RHCSA_RHEL=10 rhcsa-sim ...
+: "${RHCSA_RHEL:=$( . /etc/os-release 2>/dev/null; case "${VERSION_ID%%.*}" in 10) echo 10;; *) echo 9;; esac )}"
+export RHCSA_RHEL
+
 # ---- Colours / output ------------------------------------------------------
 if [[ -t 1 ]]; then
   C_RED=$'\e[31m'; C_GRN=$'\e[32m'; C_YEL=$'\e[33m'; C_BLU=$'\e[34m'
@@ -32,7 +41,7 @@ require_root() {
   [[ ${EUID:-$(id -u)} -eq 0 ]] || die "rhcsa-sim must be run as root (try: sudo rhcsa-sim $*)"
 }
 
-# Returns 0 if the OS is a supported RHEL 9 family release.
+# Returns 0 if the OS is a supported RHEL 9 or 10 family release.
 check_distro() {
   [[ -r /etc/os-release ]] || { warn "cannot read /etc/os-release"; return 1; }
   # shellcheck disable=SC1091
@@ -40,11 +49,12 @@ check_distro() {
   local id_like="${ID_LIKE:-} ${ID:-}"
   local ver="${VERSION_ID:-0}"
   if [[ "$id_like" == *rhel* || "${ID:-}" =~ ^(rhel|rocky|almalinux|centos)$ ]]; then
-    if [[ "${ver%%.*}" == "9" ]]; then
-      RHCSA_DISTRO="${PRETTY_NAME:-$ID $ver}"
-      return 0
-    fi
-    warn "Detected ${PRETTY_NAME:-$ID $ver} — RHCSA targets version 9; results may be inaccurate."
+    case "${ver%%.*}" in
+      9|10)
+        RHCSA_DISTRO="${PRETTY_NAME:-$ID $ver}"
+        return 0 ;;
+    esac
+    warn "Detected ${PRETTY_NAME:-$ID $ver} — RHCSA targets version 9 or 10; using RHCSA $RHCSA_RHEL content."
     RHCSA_DISTRO="${PRETTY_NAME:-$ID $ver}"
     return 2
   fi
@@ -101,8 +111,26 @@ load_meta()  {  # load_meta <task-id> -> sets TASK_TITLE/DOMAIN/POINTS
 }
 
 # List all installed task ids (sorted).
+# True when a task applies to the RHEL version we are running on. A task may
+# declare  TASK_RHEL="10"  (or "9", or "9 10") in meta.sh; UNTAGGED MEANS EVERY
+# VERSION, so the entire existing RHCSA 9 task set stays visible untouched.
+task_rhel_ok() {
+  # Sourced, not grepped, so it does not care how meta.sh is formatted. The
+  # locals keep meta.sh's assignments inside this function (no caller pollution).
+  local TASK_RHEL="" TASK_TITLE="" TASK_DOMAIN="" TASK_POINTS="" TASK_CROSSNODE=""
+  # shellcheck disable=SC1090
+  . "$RHCSA_TASKS/$1/meta.sh" 2>/dev/null || return 0
+  [[ -z "$TASK_RHEL" ]] && return 0
+  [[ " $TASK_RHEL " == *" ${RHCSA_RHEL:-9} "* ]]
+}
+
+# Every task picker (practice / random / drill / weak / list / study) enumerates
+# through here, so version filtering lives in this one place.
 all_tasks() {
-  find "$RHCSA_TASKS" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort
+  local t
+  while read -r t; do
+    task_rhel_ok "$t" && printf '%s\n' "$t"
+  done < <(find "$RHCSA_TASKS" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort)
 }
 
 # Cross-node tasks (TASK_CROSSNODE=1) only belong in curated two-node exams —
@@ -115,6 +143,23 @@ read_exam() {
   local f="$RHCSA_EXAMS/$1.list"
   [[ -r "$f" ]] || return 1
   grep -vE '^\s*(#|$)' "$f" | awk '{print $1}'
+}
+
+# The RHEL release(s) an exam paper targets, from a "# RHCSA_RHEL: 10" header
+# line in the .list file. Empty means the paper is valid on every release, so
+# every existing RHCSA 9 paper keeps working with no edit.
+exam_rhel() {
+  local f="$RHCSA_EXAMS/$1.list"
+  [[ -r "$f" ]] || f="$RHCSA_EXAMS/$1.2node.list"
+  [[ -r "$f" ]] || return 1
+  sed -n 's/^[[:space:]]*#[[:space:]]*RHCSA_RHEL:[[:space:]]*\([0-9 ]*\).*/\1/p' "$f" | head -1 | tr -s ' ' | sed 's/[[:space:]]*$//'
+}
+
+# True when an exam paper applies to the release we are running on.
+exam_rhel_ok() {
+  local v; v="$(exam_rhel "$1" 2>/dev/null)"
+  [[ -z "$v" ]] && return 0
+  [[ " $v " == *" ${RHCSA_RHEL:-9} "* ]]
 }
 
 # Parameterisation engine (opt-in; no effect on tasks without a params.sh).
@@ -255,6 +300,37 @@ compose_domain() {
 
 # All RHCSA categories the practice mode accepts.
 RHCSA_CATEGORIES="containers deploy filesystems network operate scripting security storage tools users"
+
+# The categories that actually have tasks on THIS release, in the master order
+# above. A whole domain can be empty on one release — containers is empty on
+# RHEL 10, where the objectives dropped it — and offering an empty category
+# composes a session with nothing in it. Callers validate against this, not the
+# static list. Cached after the first call: it costs one meta.sh read per task.
+available_categories() {
+  # Cache is keyed by release: RHCSA_RHEL can change within one shell (the
+  # authoring override, the test harness), and an unkeyed cache would answer
+  # for the wrong release.
+  if [[ "${_RHCSA_AVAIL_CATS_FOR:-}" != "${RHCSA_RHEL:-9}" ]]; then
+    local t d seen=" " c out=""
+    while read -r t; do
+      [[ -z "$t" ]] && continue
+      local TASK_TITLE="" TASK_DOMAIN="" TASK_POINTS="" TASK_CROSSNODE="" TASK_RHEL=""
+      # shellcheck disable=SC1090
+      . "$RHCSA_TASKS/$t/meta.sh" 2>/dev/null || continue
+      d="$TASK_DOMAIN"
+      [[ -n "$d" && " $seen " != *" $d "* ]] && seen="$seen$d "
+    done < <(all_tasks)
+    for c in $RHCSA_CATEGORIES; do
+      [[ " $seen " == *" $c "* ]] && out="$out$c "
+    done
+    _RHCSA_AVAIL_CATS="${out% }"
+    _RHCSA_AVAIL_CATS_FOR="${RHCSA_RHEL:-9}"
+  fi
+  printf '%s' "$_RHCSA_AVAIL_CATS"
+}
+
+# True when a category has tasks on this release.
+category_available() { [[ " $(available_categories) " == *" $1 "* ]]; }
 
 # Mutually-exclusive task groups: tasks that share a FIXED resource (an output
 # file, the default boot target, one system service, the tuned profile, the

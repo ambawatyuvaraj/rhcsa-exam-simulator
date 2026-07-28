@@ -8,3 +8,6 @@ assets/*.tar
 *.log
 *.tmp
 *.bak
+
+# Internal planning notes (not part of the product)
+docs/plans/

@@ -1,0 +1,27 @@
+# RHCSA_RHEL: 10
+# RHCSA 10 two-node exam 02 (e2-* task family; containers/collab replaced by
+# Flatpak + timer). node1 = configure; node2 = reset root pw then storage/tuned.
+# ---- node1 ----
+node1 e2-network
+node1 e2-repo
+node1 flatpak-remote
+node1 flatpak-install
+node1 selinux-port
+node1 e2-users
+node1 e2-cron
+node1 systemd-timer
+node1 chrony-iburst
+node1 f08-autofs
+node1 e2-uid
+node1 e2-findowner
+node1 e2-grep
+node1 e2-backup
+node1 e2-script
+node1 e2-sudo
+# ---- node2 ----
+node2 root-password
+node2 e2-repo2
+node2 e2-lvresize
+node2 e2-swap
+node2 e2-lvm
+node2 tuning-profile

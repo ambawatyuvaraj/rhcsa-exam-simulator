@@ -1,0 +1,7 @@
+A Flatpak remote named "{{REMOTE}}" is already configured on this system,
+pointing at a local repository.
+
+Install the application "{{APP_ID}}" from that remote, system-wide, so that it
+appears in the list of installed Flatpak applications.
+
+Verify with:  flatpak list --app

@@ -85,3 +85,27 @@ The solver is test-only (not installed); keep it minimal and correct.
 - `tasks/package-install/` — parameterised (`PKG`), simple grade.
 - `tasks/selinux-boolean/` — parameterised (`SBOOL`), `ckpt_expr` grade.
 - `tasks/users-groups/`, `tasks/lvm-create/`, `tasks/container-service/` — richer existing examples.
+
+## RHEL version targeting (RHCSA 9 vs 10)
+The simulator serves one content set per host, chosen automatically from
+`/etc/os-release`: RHEL 10 → RHCSA 10, anything else → RHCSA 9. `RHCSA_RHEL`
+(9 or 10) is set in `lib/common.sh` and can be forced for testing:
+`RHCSA_RHEL=10 rhcsa-sim …`.
+
+- **Task applies to one version only:** add `TASK_RHEL="9"` (or `"10"`, or
+  `"9 10"`) to `meta.sh`. **Omit it and the task applies to BOTH** — that is the
+  default, so the whole legacy set needs no edit. The tag is filtered once, in
+  `all_tasks()`, so every picker (practice/random/drill/weak/list) honours it.
+- **Same task, different answer per version:** ship `solution.rhel10.md` (and/or
+  `prompt.rhel10.txt`) beside the defaults; `lib/params.sh` prefers the
+  `*.rhel<N>` file when running on that release. Only add these where the
+  procedure genuinely differs.
+- **Exam papers** declare their release with a header comment
+  `# RHCSA_RHEL: 10` (or `9`, or `9 10`); no header = valid on both. `list`
+  hides mismatched papers and `start` refuses one.
+- **RHEL 10 gotchas that break ported RHEL 9 tasks:** `mkfs.xfs` refuses XFS
+  below 300 MiB (size storage tasks ≥ 320 MiB); `gdisk`/`sgdisk` are gone (use
+  `parted`); partitioning is GPT-only; password hashing is yescrypt (`$y$`).
+- **Self-check:** `bash tests/version_test.sh` asserts detection, the
+  `TASK_RHEL` filter, the versioned-file override, exam gating, category
+  availability, and that no task is hidden on *both* releases (a typo'd tag).

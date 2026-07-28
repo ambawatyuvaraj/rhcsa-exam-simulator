@@ -77,6 +77,9 @@ load_task_params() {    # load_task_params <task-id>
 render_prompt() {       # render_prompt <task-id> <task-dir>
   local id="$1" dir="$2"
   local pf="$RHCSA_PARAMS_DIR/$id.env" src="$dir/prompt.txt" out="$RHCSA_PROMPTS_DIR/$id.txt"
+  # A task whose wording differs per RHEL release ships prompt.rhel<N>.txt beside
+  # prompt.txt; the versioned file wins when present (see also render_solution).
+  [[ -f "$dir/prompt.rhel${RHCSA_RHEL}.txt" ]] && src="$dir/prompt.rhel${RHCSA_RHEL}.txt"
   mkdir -p "$RHCSA_PROMPTS_DIR"
   [[ -f "$src" ]] || return 0
   if [[ -f "$pf" ]]; then
@@ -104,6 +107,10 @@ render_solution() {     # render_solution <task-id> [outfile]
   local id="$1" dir; dir="$(task_dir "$id")"
   local out="${2:-$RHCSA_SOLUTIONS_DIR/$id.txt}"
   local pf="$RHCSA_PARAMS_DIR/$id.env" src="$dir/solution.md"
+  # Teach the procedure that is correct for THIS OS: a task whose answer differs
+  # between releases (e.g. podman generate systemd on 9 vs Quadlet on 10) ships
+  # solution.rhel<N>.md, which wins over solution.md when running on that release.
+  [[ -f "$dir/solution.rhel${RHCSA_RHEL}.md" ]] && src="$dir/solution.rhel${RHCSA_RHEL}.md"
   mkdir -p "$(dirname "$out")"
   [[ -f "$src" ]] || { echo "(no reference solution for $id)" >"$out"; return 0; }
   if [[ -f "$pf" ]]; then
