@@ -483,9 +483,27 @@ _system_disks() {
 }
 
 _deep_reset_local() {
-  local rootsrc rootdisk m d p vg nic c u
+  local rootsrc rootdisk m d p vg nic c u _rootvg _dmesc _sysswap_ids
   rootsrc="$(findmnt -no SOURCE / 2>/dev/null)"
   rootdisk="$(lsblk -no PKNAME "$rootsrc" 2>/dev/null | head -1)"
+
+  # Name of the VG that holds the OS, and its device-mapper form. LVM doubles a
+  # '-' in a VG name in the dm name ('rhel_host-016' -> 'rhel_host--016-root'),
+  # so the dm guards below MUST match on the ESCAPED form — otherwise the live
+  # root/swap LVs look like foreign orphans and get removed. Default to 'rhel'
+  # for a non-LVM root (there is no root VG to protect then).
+  _rootvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d ' ')"
+  [ -z "$_rootvg" ] && _rootvg=rhel
+  _dmesc="${_rootvg//-/--}"
+
+  # Capture the machine's REAL swap identity (path + UUID + LABEL) BEFORE
+  # swapoff, so the fstab cleanup below keeps its swap line no matter which VG
+  # it lives in or whether fstab references it by UUID/LABEL.
+  _sysswap_ids="$(swapon --show=NAME --noheadings 2>/dev/null | while read -r _s; do
+      printf '%s\n' "$_s"
+      blkid -s UUID  -o value "$_s" 2>/dev/null
+      blkid -s LABEL -o value "$_s" 2>/dev/null
+    done | tr '\n' ' ')"
 
   # --- storage: unmount sim mountpoints (NEVER /mnt/dvd), disable extra swap ---
   for m in $(findmnt -rn -o TARGET 2>/dev/null | grep -E '^/(mnt|autohomes|rhome|shared-tmp|team|restricted|webdata|exports|data)' | grep -vx /mnt/dvd); do
@@ -518,13 +536,11 @@ _deep_reset_local() {
     # clear the disk, and the stale volume reappears at the next seed mounted with
     # NO backing VG ("Volume group wgroup not found"). dmsetup removes it by its
     # live mapping. Three passes resolve snapshot origin/cow ordering.
-    local _rootvg _dm _pass _rm
-    _rootvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d ' ')"
-    [ -z "$_rootvg" ] && _rootvg=rhel
+    local _dm _pass _rm
     for _pass in 1 2 3; do
       _rm=0
       for _dm in $(dmsetup ls 2>/dev/null | awk 'NF{print $1}'); do
-        case "$_dm" in "${_rootvg}-"*) continue ;; esac   # system root/swap LVs — never touch
+        case "$_dm" in "${_dmesc}-"*) continue ;; esac   # system root/swap LVs — never touch
         umount -lf "/dev/mapper/$_dm" 2>/dev/null
         dmsetup remove -f "$_dm" >/dev/null 2>&1 && _rm=1
       done
@@ -556,7 +572,22 @@ _deep_reset_local() {
   losetup -D 2>/dev/null
   # fstab: drop sim-added lines; keep root + the original root swap
   sed -i -E '\#(/mnt/[^d]|/mnt/dvd|/autohomes|/rhome|/swapfile|^tmpfs|[[:space:]]tmpfs[[:space:]]|LABEL=|UUID=[0-9a-f-]+[[:space:]]+/mnt|/dev/[vsh]d[b-z]|/dev/nvme[0-9]|/exports/)#{/\/mnt\/dvd/!d}' /etc/fstab 2>/dev/null
-  sed -i '/swap/{/rhel-swap/!d}' /etc/fstab 2>/dev/null
+  # Keep the machine's own swap line(s) — matched by the system swap device
+  # path / UUID / LABEL captured above, or by the OS VG name (plain + escaped).
+  # A hardcoded 'rhel-swap' dropped the swap line on any other VG name (e.g.
+  # 'rhel_host-016'), silently disabling swap persistence after a reset.
+  if [ -f /etc/fstab ]; then
+    awk -v keep="${_sysswap_ids} ${_rootvg} ${_dmesc}" '
+      {
+        if ($0 ~ /(^|[[:space:]])swap([[:space:]]|$)/) {
+          n = split(keep, k, " "); ok = 0
+          for (i = 1; i <= n; i++) if (k[i] != "" && index($0, k[i])) ok = 1
+          if (!ok) next
+        }
+        print
+      }' /etc/fstab > /etc/fstab.rhcsa.tmp 2>/dev/null && cat /etc/fstab.rhcsa.tmp > /etc/fstab 2>/dev/null
+    rm -f /etc/fstab.rhcsa.tmp
+  fi
   find /mnt -maxdepth 1 -mindepth 1 ! -name dvd -exec rm -rf {} + 2>/dev/null
   rm -rf /swapfile /autohomes /rhome /exports 2>/dev/null
 
@@ -567,20 +598,31 @@ _deep_reset_local() {
   systemctl daemon-reload 2>/dev/null
 
   # --- accounts: remove every human USER/GROUP the practice created (UID/GID
-  #     >= 1000), along with its home, mail spool and crontab. A disposable
-  #     practice VM has only 'student' + the 'rhcsactl' service account as real
-  #     accounts — everything else is a task artifact. Names are captured by the
+  #     >= 1000), along with its home, mail spool and crontab. Preserve the
+  #     simulator service account 'rhcsactl', the documented 'student' practice
+  #     login, the account that invoked sudo (the human running the exam — NOT
+  #     necessarily named 'student', e.g. 'lollo'), and every member of the admin
+  #     group 'wheel'. Tasks never add users to 'wheel' (only restrict-su toggles
+  #     PAM), so nothing a task creates is protected. Names are captured by the
   #     command substitution BEFORE the loop body runs, so deleting while reading
   #     /etc/passwd is safe. -----------------------------------------------------
-  local acct
+  local acct _keep=" student rhcsactl " _keepg=" student rhcsactl wheel "
+  [[ -n "${SUDO_USER:-}" ]] && _keep="$_keep$SUDO_USER "
+  for acct in $(getent group wheel 2>/dev/null | awk -F: '{print $4}' | tr ',' ' '); do
+    _keep="$_keep$acct "
+  done
+  for acct in $_keep; do
+    local _pg; _pg="$(id -gn "$acct" 2>/dev/null)" || true
+    [[ -n "$_pg" ]] && _keepg="$_keepg$_pg "
+  done
   for acct in $(awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/passwd 2>/dev/null); do
-    case " student rhcsactl " in *" $acct "*) continue;; esac
+    case "$_keep" in *" $acct "*) continue;; esac
     pkill -9 -u "$acct" 2>/dev/null
     crontab -r -u "$acct" 2>/dev/null
     userdel -rf "$acct" 2>/dev/null
   done
   for acct in $(awk -F: '$3>=1000 && $3<60000 {print $1}' /etc/group 2>/dev/null); do
-    case " student rhcsactl wheel " in *" $acct "*) continue;; esac
+    case "$_keepg" in *" $acct "*) continue;; esac
     groupdel "$acct" 2>/dev/null
   done
   # sweep orphaned crontabs / home dirs whose owner no longer exists

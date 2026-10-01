@@ -65,19 +65,23 @@ _find_unused_disk() {
 # behind; after a handful of storage tasks no disk is "bare" anymore and
 # _find_unused_disk returns nothing -> later storage tasks can't seed (this is
 # why a back-to-back `practice storage` re-run, or a full storage audit, fails).
-# Hard guards: never touches a loop device, the root disk, or the 'rhel' VG.
+# Hard guards: never touches a loop device, the root disk, or the OS VG.
 _wipe_spare_disk() {
-  local d="$1" rootsrc rootdisk pv vg sz
+  local d="$1" rootsrc rootdisk sysvg pv vg sz
   [[ -b "$d" ]] || return 0
   case "$d" in /dev/loop*) return 0 ;; esac
   rootsrc="$(findmnt -no SOURCE / 2>/dev/null)"
   rootdisk="$(lsblk -no PKNAME "$rootsrc" 2>/dev/null | head -1)"
   [[ -n "$rootdisk" && "$d" == "/dev/$rootdisk" ]] && return 0
+  # The OS volume group — never tear it down. It is NOT necessarily named 'rhel'
+  # (e.g. 'rhel_host-016' when Anaconda derives the name from the host).
+  sysvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d '[:space:]')"
+  [[ -z "$sysvg" ]] && sysvg=rhel
   # Tear down any LVM stack living on the disk or its partitions first.
   for pv in "$d" "$d"[0-9]* "$d"p[0-9]*; do
     [[ -b "$pv" ]] || continue
     vg="$(pvs --noheadings -o vg_name "$pv" 2>/dev/null | tr -d '[:space:]')"
-    if [[ -n "$vg" && "$vg" != rhel ]]; then
+    if [[ -n "$vg" && "$vg" != "$sysvg" ]]; then
       vgchange -an "$vg" >/dev/null 2>&1
       vgremove -f "$vg" >/dev/null 2>&1
     fi
