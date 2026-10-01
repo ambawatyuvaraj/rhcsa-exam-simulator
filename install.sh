@@ -180,7 +180,7 @@ echo "  Note: 'practice storage' seeds one task per blank spare disk (reboot-saf
 echo "        attach more spare disks to the VM for more storage tasks per session."
 echo "  then:"
 echo "    rhcsa-sim list"
-echo "    rhcsa-sim start exam-01        # or: rhcsa-sim start random"
+echo "    rhcsa-sim start $( [ "$RHCSA_RHEL" = 10 ] && echo exam-r10-01 || echo exam-01 )    # or: rhcsa-sim start random"
 echo "    rhcsa-sim grade --reboot"
 echo "    rhcsa-sim report --html"
 echo

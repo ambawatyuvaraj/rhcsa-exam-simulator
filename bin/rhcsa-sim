@@ -291,7 +291,13 @@ cmd_start() {
     esac
   done
   [[ "${_RHCSA_PRACTICE:-}" == 1 ]] && practice=1
-  sel="${sel:-exam-01}"
+  if [[ -z "$sel" ]]; then [[ "$RHCSA_RHEL" == 10 ]] && sel=exam-r10-01 || sel=exam-01; fi
+  # Validate the name BEFORE the self-clean below: a typo must not wipe the VM.
+  case "$sel" in
+    random|two-node|2node) ;;
+    *) [[ -r "$RHCSA_EXAMS/$sel.list" || -r "$RHCSA_EXAMS/$sel.2node.list" ]] \
+         || die "unknown exam '$sel'. Run 'rhcsa-sim list' for the papers available here." ;;
+  esac
   # Refuse a paper written for the other RHCSA version rather than seeding it:
   # its tasks would be filtered out by release, so the candidate would work
   # against a total they cannot reach.
@@ -788,7 +794,9 @@ _leftover_vg() {
 
 # True when a previous session left state to clean — so 'start'/'practice' only
 # deep-clean when needed, never on a fresh first run (no message, no wait).
-_needs_clean() { session_active || [[ -n "$(ls -A "$RHCSA_PARAMS_DIR" 2>/dev/null)" ]] || [[ -d "$RHCSA_RESULTS" ]] || _leftover_vg; }
+# (results must be NON-EMPTY: install.sh creates the dir, so a bare -d test made
+# the very first 'start' after install run the full deep clean.)
+_needs_clean() { session_active || [[ -n "$(ls -A "$RHCSA_PARAMS_DIR" 2>/dev/null)" ]] || [[ -n "$(ls -A "$RHCSA_RESULTS" 2>/dev/null)" ]] || _leftover_vg; }
 
 # Centered green "Aids ON (Practice)" banner — the browser/TUI has its own
 # hint/solution/check buttons, so the terminal just states that aids are on.
@@ -1666,8 +1674,8 @@ cmd_doctor() {
   fi
 
   # 8. spare disk for storage tasks (LVM/swap/partitions)
-  local nspare; nspare="$(lsblk -dnro NAME,TYPE 2>/dev/null | awk '$2=="disk"{print $1}' | grep -vx "$(lsblk -no PKNAME "$(findmnt -no SOURCE / 2>/dev/null)" 2>/dev/null | head -1)" | wc -l)"
-  if [[ "${nspare:-0}" -ge 1 ]]; then _p "additional disks present (storage tasks can claim a spare)"; else _w "no spare disk detected — add at least one extra virtual disk for LVM/swap/partition tasks (or set RHCSA_ALLOW_LOOP=1, not reboot-safe)"; fi
+  local nspare; nspare="$(lsblk -dnro NAME,TYPE 2>/dev/null | awk '$2=="disk" && $1!~/^(sr|loop|fd|zram)/{print $1}' | grep -vxF "$(_os_disks)" | wc -l)"
+  if [[ "${nspare:-0}" -ge 1 ]]; then _p "additional disks present (storage tasks can claim a spare)"; else _w "no spare disk detected — every disk holds part of the OS install. Add a BLANK extra virtual disk for LVM/swap/partition tasks (don't let the RHEL installer use it), or set RHCSA_ALLOW_LOOP=1 (not reboot-safe)"; fi
 
   # 9. container runtime + python (sessions/TUI/report all need python3)
   if command -v podman >/dev/null 2>&1; then _p "podman present (container tasks)"; else _w "podman not installed — container tasks will fail"; fi

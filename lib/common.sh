@@ -467,13 +467,34 @@ _ensure_local_repo_mounted() {
 # the DVD repo at /mnt/dvd, node.conf / rhcsactl / the root SSH key. Never
 # touches the root disk or root VG.
 
+# Disks the OS install itself lives on: whatever holds /, /boot, /boot/efi, plus
+# EVERY PV of the OS volume group. Independent of what else is mounted or swapped
+# on, so it is safe to call at any time (doctor, before swapoff, mid-session).
+# The PV walk matters: an installer given two disks can put the OS VG on both
+# (e.g. sda3 + sdb1), and a disk holding only the OS swap LV looks unused once
+# swap is off — it must never be mistaken for a spare.
+_os_disks() {
+  local rootsrc rootvg
+  rootsrc="$(findmnt -no SOURCE / 2>/dev/null)"
+  rootvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d ' ')"
+  { printf '%s\n' "$rootsrc"
+    findmnt -no SOURCE /boot 2>/dev/null
+    findmnt -no SOURCE /boot/efi 2>/dev/null
+    [ -n "$rootvg" ] && pvs --noheadings -o pv_name -S vg_name="$rootvg" 2>/dev/null
+  } | while read -r src; do
+        [ -n "$src" ] || continue
+        lsblk -rsno NAME,TYPE "$src" 2>/dev/null | awk '$2=="disk"{print $1}'
+      done | sort -u
+}
+
 # Physical disk(s) the OS lives on — reset NEVER wipes these. Disk-name-agnostic
 # (vd*/sd*/nvme*/hd*) and LVM/RAID-aware: walks each mounted device / active swap /
 # the root source DOWN to its physical disk via lsblk's reverse dependency tree.
 # Returns bare disk names (e.g. "vda", "sda", "nvme0n1"). Call AFTER sim mounts +
 # extra swap are turned off, so only the real system disk(s) remain.
 _system_disks() {
-  { findmnt -no SOURCE / 2>/dev/null
+  { _os_disks | sed 's|^|/dev/|'
+    findmnt -no SOURCE / 2>/dev/null
     lsblk -rno NAME,MOUNTPOINT 2>/dev/null | awk '$2!=""{print "/dev/"$1}'
     swapon --show=NAME --noheadings 2>/dev/null
   } | while read -r src; do
@@ -498,8 +519,13 @@ _deep_reset_local() {
 
   # Capture the machine's REAL swap identity (path + UUID + LABEL) BEFORE
   # swapoff, so the fstab cleanup below keeps its swap line no matter which VG
-  # it lives in or whether fstab references it by UUID/LABEL.
+  # it lives in or whether fstab references it by UUID/LABEL. Only swap on an OS
+  # disk counts: a candidate's swap on a spare disk is still active here when its
+  # teardown didn't run, and keeping its line would leave fstab pointing at a
+  # device the wipe below destroys.
+  local _osdisks; _osdisks="$(_os_disks)"
   _sysswap_ids="$(swapon --show=NAME --noheadings 2>/dev/null | while read -r _s; do
+      lsblk -rsno NAME,TYPE "$_s" 2>/dev/null | awk '$2=="disk"{print $1}' | grep -qxF "$_osdisks" || continue
       printf '%s\n' "$_s"
       blkid -s UUID  -o value "$_s" 2>/dev/null
       blkid -s LABEL -o value "$_s" 2>/dev/null

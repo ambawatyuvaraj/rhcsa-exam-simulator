@@ -26,6 +26,9 @@ on a live system, automated objective grading, and a scored, per-task report.
 > CentOS Stream 9|10) virtual machine.** The simulator creates users, partitions,
 > logical volumes, services, and firewall/SELinux rules. **Take a VM snapshot
 > before you start** — reverting it is the reliable way to reset.
+> Reset (which `start` also runs) deletes every regular user account (UID ≥ 1000)
+> except `student`, members of `wheel`, and the user running `sudo` — so
+> practise from an admin account, and keep nothing you need on the VM.
 
 ## Screenshots
 
@@ -90,7 +93,7 @@ Flatpak and timer tasks are verified to survive it.
 
 ```bash
 sudo rhcsa-sim doctor            # check the environment is ready
-sudo rhcsa-sim start exam-01     # seed a 150-minute exam and start the timer
+sudo rhcsa-sim start exam-01     # seed a 150-minute exam and start the timer (RHEL 10: exam-r10-01)
 sudo rhcsa-sim tui               # open the browser exam paper (use --text for a terminal UI)
 #   ... do the tasks on the live system ...
 sudo rhcsa-sim grade --reboot    # grade after a reboot (persistence test), like the real exam
@@ -135,7 +138,9 @@ sudo rhcsa-sim grade --reboot        # reboots + grades both, prints one combine
 ## Requirements
 
 - A disposable **RHEL 9 or RHEL 10** VM (or Rocky / AlmaLinux / CentOS Stream
-  9|10) — ~2 GB RAM, plus one blank spare disk for storage tasks.
+  9|10) — ~2 GB RAM, plus one blank spare disk for storage tasks. Install
+  RHEL on the first disk only — if the installer also uses the spare, the OS
+  spans both disks and there is nothing left to practise on (`doctor` warns).
 - The matching **install DVD ISO** attached — the offline package source (and,
   on RHEL 10, the Flatpak source).
 - Two-node exams need a second identical VM, paired with `rhcsa-sim node-setup`.
