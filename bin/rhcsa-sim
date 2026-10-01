@@ -184,6 +184,23 @@ _paper_json() {
 # prompts, and write ONE session whose "paper" lists every task (both nodes).
 # Local grade/report still operate only on node1's own "tasks" — node2 is graded
 # over SSH and merged — so the existing single-node code paths are unchanged.
+# Runs only AFTER the user typed CONFIRM — nothing destructive happens before it.
+# SELF-CLEAN: clear any previous session's task changes so a fresh exam never
+# inherits leftovers (same teardowns + deep clean as 'reset'; history preserved),
+# THEN set the session-mode marker (_reset_clean deletes the markers):
+# practice = aids on, not counted; mock = aid-free and counted; neither = real exam.
+_preseed() {
+  local practice="${1:-0}"
+  if _needs_clean; then
+    info "Clearing previous session state before seeding (so no task starts pre-completed) ..."
+    _reset_clean
+  fi
+  mkdir -p "$RHCSA_STATE"
+  if   (( practice ));                 then : >"$RHCSA_STATE/practice.flag"; rm -f "$RHCSA_STATE/mock.flag" 2>/dev/null
+  elif [[ "${_RHCSA_MOCK:-}" == 1 ]];  then : >"$RHCSA_STATE/mock.flag";     rm -f "$RHCSA_STATE/practice.flag" 2>/dev/null
+  else rm -f "$RHCSA_STATE/mock.flag" "$RHCSA_STATE/practice.flag" 2>/dev/null; fi
+}
+
 _controller_start() {
   local sel="$1" dur="$2" practice="${3:-0}" t
   local n1=() n2=()
@@ -199,6 +216,7 @@ _controller_start() {
   echo "${C_BOLD}TAKE VM SNAPSHOTS OF BOTH NODES NOW.${C_OFF}"
   read -r -p "Type ${C_BOLD}CONFIRM${C_OFF} to seed both and start the timer: " ans
   [[ "$ans" == "CONFIRM" ]] || die "aborted (no confirmation)."
+  _preseed "$practice"
 
   mkdir -p "$RHCSA_STATE" "$RHCSA_RESULTS" "$RHCSA_PARAMS_DIR" "$RHCSA_PROMPTS_DIR" "$RHCSA_HINTS_DIR" "$RHCSA_SOLUTIONS_DIR"
   rm -f "$RHCSA_RESULTS"/*.jsonl "$RHCSA_PARAMS_DIR"/*.env "$RHCSA_PROMPTS_DIR"/*.txt "$RHCSA_HINTS_DIR"/*.txt "$RHCSA_SOLUTIONS_DIR"/*.txt "$RHCSA_STATE/tasktime.json" "$RHCSA_STATE/master.json" 2>/dev/null
@@ -304,20 +322,6 @@ cmd_start() {
   if ! exam_rhel_ok "$sel"; then
     die "'$sel' is a RHCSA $(exam_rhel "$sel") paper, but this system is RHEL ${RHCSA_RHEL} (RHCSA ${RHCSA_RHEL} content). Run 'rhcsa-sim list' for the papers available here."
   fi
-  # SELF-CLEAN: always clear any previous session's task changes before seeding, so a
-  # fresh exam never inherits leftovers (no need to remember 'reset' first). This runs
-  # the same teardowns + deep clean as 'reset' (history is preserved).
-  if _needs_clean; then
-    info "Clearing previous session state before seeding (so no task starts pre-completed) ..."
-    _reset_clean
-  fi
-  # Session-mode markers (mutually exclusive): practice = learning mode WITH aids
-  # (hint/solution/check; recorded as 'practice', does not count toward readiness);
-  # mock = aid-free dress rehearsal that DOES count; neither = a real exam.
-  mkdir -p "$RHCSA_STATE"
-  if   (( practice ));                 then : >"$RHCSA_STATE/practice.flag"; rm -f "$RHCSA_STATE/mock.flag" 2>/dev/null
-  elif [[ "${_RHCSA_MOCK:-}" == 1 ]];  then : >"$RHCSA_STATE/mock.flag";     rm -f "$RHCSA_STATE/practice.flag" 2>/dev/null
-  else rm -f "$RHCSA_STATE/mock.flag" "$RHCSA_STATE/practice.flag" 2>/dev/null; fi
   if [[ -n "$role" ]]; then
     node_configured || die "run 'rhcsa-sim node-setup --role $role --peer <peer-ip>' first."
     load_node_conf
@@ -338,7 +342,7 @@ cmd_start() {
   detect_virt || warn "Could not confirm this is a VM (virt=$RHCSA_VIRT). Running on bare metal is STRONGLY discouraged."
 
   if session_active; then
-    warn "An exam session already exists. 'rhcsa-sim reset' first, or it will be overwritten."
+    warn "An exam session already exists — it will be cleared after you confirm."
   fi
 
   # Resolve task list
@@ -352,12 +356,14 @@ cmd_start() {
   hr
   echo "This will create users, groups, partitions, logical volumes, services,"
   echo "container images and config on THIS machine to seed the exam environment."
+  echo "It first resets what earlier sessions changed (spare disks wiped, task users removed)."
   echo
   echo "${C_BOLD}TAKE A VM SNAPSHOT NOW.${C_OFF} Reverting that snapshot is the reliable"
   echo "way to reset between attempts."
   echo
   read -r -p "Type ${C_BOLD}CONFIRM${C_OFF} to seed the environment and start the timer: " ans
   [[ "$ans" == "CONFIRM" ]] || die "aborted (no confirmation)."
+  _preseed "$practice"
 
   # Seed prerequisites
   mkdir -p "$RHCSA_STATE" "$RHCSA_RESULTS" "$RHCSA_PARAMS_DIR" "$RHCSA_PROMPTS_DIR"
@@ -771,23 +777,18 @@ cmd_autoreport() {
 # same-named VGs at the next boot, LVM refuses to activate either, and the
 # reboot-grade scores the storage tasks 0 even though 'check' passed live.
 _leftover_vg() {
-  local rootsrc rootvg dmesc vg dm
-  rootsrc="$(findmnt -no SOURCE / 2>/dev/null)"
-  rootvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d ' ')"
-  [[ -z "$rootvg" ]] && rootvg=rhel            # non-LVM root → 'rhel' is the system VG
-  # device-mapper doubles '-' in VG names ('rhel_host-016' -> 'rhel_host--016-root').
-  # Without the escaped form the live root/swap LVs are mistaken for leftover
-  # orphans and EVERY 'start' would force a full deep reset.
-  dmesc="${rootvg//-/--}"
-  for vg in $(vgs --noheadings -o vg_name 2>/dev/null | tr -d ' '); do
-    [[ "$vg" == "$rootvg" ]] && continue
-    return 0                                    # a non-root VG = leftover storage
+  # Judged by DISK, not by name: anything on an OS disk (root VG under any name,
+  # LUKS root, a second VG sharing the OS disk) is the system, never "leftover".
+  local os pv dm
+  os="$(_os_disks)"
+  [[ -z "$os" ]] && return 1                    # can't tell OS from spare: never force a clean on a guess
+  for pv in $(pvs --noheadings -o pv_name 2>/dev/null); do
+    _disks_of "$pv" | grep -qxF "$os" || return 0   # a PV off the OS disks = leftover task storage
   done
   # Also catch ORPHANED active LVs whose VG metadata is already gone (a whole-disk
-  # PV got repartitioned): invisible to `vgs`, but still a live device-mapper node.
-  for dm in $(dmsetup ls 2>/dev/null | awk 'NF{print $1}'); do
-    case "$dm" in "${dmesc}-"*) continue ;; esac
-    return 0
+  # PV got repartitioned): invisible to `pvs`, but still a live device-mapper node.
+  for dm in $(dmsetup ls 2>/dev/null | awk 'NF && $1!="No"{print $1}'); do
+    _disks_of "/dev/mapper/$dm" | grep -qxF "$os" || return 0
   done
   return 1
 }

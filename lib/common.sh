@@ -487,6 +487,9 @@ _os_disks() {
       done | sort -u
 }
 
+# Physical disk(s) under a block device (LV, LUKS mapping, partition, ...), one per line.
+_disks_of() { lsblk -rsno NAME,TYPE "$1" 2>/dev/null | awk '$2=="disk"{print $1}'; }
+
 # Physical disk(s) the OS lives on — reset NEVER wipes these. Disk-name-agnostic
 # (vd*/sd*/nvme*/hd*) and LVM/RAID-aware: walks each mounted device / active swap /
 # the root source DOWN to its physical disk via lsblk's reverse dependency tree.
@@ -567,6 +570,9 @@ _deep_reset_local() {
       _rm=0
       for _dm in $(dmsetup ls 2>/dev/null | awk 'NF{print $1}'); do
         case "$_dm" in "${_dmesc}-"*) continue ;; esac   # system root/swap LVs — never touch
+        # ...nor anything else stacked on an OS disk: a LUKS root (luks-<uuid>), a
+        # second system VG (/home), etc. — their names don't carry the root VG's.
+        _disks_of "/dev/mapper/$_dm" | grep -qxF "$sysdisks" && continue
         umount -lf "/dev/mapper/$_dm" 2>/dev/null
         dmsetup remove -f "$_dm" >/dev/null 2>&1 && _rm=1
       done
