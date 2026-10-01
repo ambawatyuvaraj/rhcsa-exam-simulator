@@ -765,10 +765,14 @@ cmd_autoreport() {
 # same-named VGs at the next boot, LVM refuses to activate either, and the
 # reboot-grade scores the storage tasks 0 even though 'check' passed live.
 _leftover_vg() {
-  local rootsrc rootvg vg dm
+  local rootsrc rootvg dmesc vg dm
   rootsrc="$(findmnt -no SOURCE / 2>/dev/null)"
   rootvg="$(lvs --noheadings -o vg_name "$rootsrc" 2>/dev/null | tr -d ' ')"
   [[ -z "$rootvg" ]] && rootvg=rhel            # non-LVM root → 'rhel' is the system VG
+  # device-mapper doubles '-' in VG names ('rhel_host-016' -> 'rhel_host--016-root').
+  # Without the escaped form the live root/swap LVs are mistaken for leftover
+  # orphans and EVERY 'start' would force a full deep reset.
+  dmesc="${rootvg//-/--}"
   for vg in $(vgs --noheadings -o vg_name 2>/dev/null | tr -d ' '); do
     [[ "$vg" == "$rootvg" ]] && continue
     return 0                                    # a non-root VG = leftover storage
@@ -776,7 +780,7 @@ _leftover_vg() {
   # Also catch ORPHANED active LVs whose VG metadata is already gone (a whole-disk
   # PV got repartitioned): invisible to `vgs`, but still a live device-mapper node.
   for dm in $(dmsetup ls 2>/dev/null | awk 'NF{print $1}'); do
-    case "$dm" in "${rootvg}-"*) continue ;; esac
+    case "$dm" in "${dmesc}-"*) continue ;; esac
     return 0
   done
   return 1
