@@ -78,7 +78,15 @@ cmd_list() {
     # version would seed tasks the host cannot do and score against an
     # unreachable total. Papers with no declaration are valid everywhere.
     exam_rhel_ok "$id" || continue
-    local n; n="$(read_exam "$id" | wc -l)"
+    local n
+    if [[ "$id" == *.2node ]]; then
+      # Show the name 'start' takes, and count real tasks, not "<node> <task>" lines.
+      id="${id%.2node}"
+      n="$( { read_node_exam "$id" node1; read_node_exam "$id" node2; } 2>/dev/null | wc -l)"
+      printf '  %-12s %s tasks (two-node)\n' "$id" "$n"
+      continue
+    fi
+    n="$(read_exam "$id" | wc -l)"
     printf '  %-12s %s tasks\n' "$id" "$n"
   done
   printf '  %-12s one random task per domain\n' "random"
@@ -308,6 +316,10 @@ cmd_start() {
       *)          sel="$1"; shift;;
     esac
   done
+  # Accept a two-node paper's file name ("exam-x.2node"): with the suffix,
+  # "$sel.list" resolves to the .2node file and is_node_exam fails, so the
+  # "<node> <task>" lines were read as task ids "node1"/"node2" and nothing seeded.
+  sel="${sel%.2node}"
   [[ "${_RHCSA_PRACTICE:-}" == 1 ]] && practice=1
   if [[ -z "$sel" ]]; then [[ "$RHCSA_RHEL" == 10 ]] && sel=exam-r10-01 || sel=exam-01; fi
   # Validate the name BEFORE the self-clean below: a typo must not wipe the VM.
