@@ -29,7 +29,8 @@ ${C_BOLD}${C_YEL}QUICK START${C_OFF}
 ${C_BOLD}TAKE AN EXAM${C_OFF}
   start EXAM|random        seed + start the 150-min countdown   (papers: rhcsa-sim list)
   mock [EXAM]              dress rehearsal — aid-free, counts toward your readiness score
-  tui                      open the exam paper in a browser (the real Exam View) · tui --text = terminal
+  tui                      open the exam paper in a browser (the real Exam View) — runs in the
+                           background (tui --stop to close) · tui --text = terminal
   vm ACTION node1|node2    VM control: status·reboot·shutdown·console·rebuild (like the exam's VM manager)
   status                   time remaining / what session is running
   grade [--reboot]         grade now (--reboot first = persistence test, like the real exam)
@@ -106,6 +107,9 @@ cmd_status() {
   exam="$(session_field exam)"; start="$(session_field start)"; dur="$(session_field duration)"
   now="$(date +%s)"; left=$(( start + dur - now ))
   echo "Exam:        $exam"
+  if [[ -s "$RHCSA_STATE/web.urls" ]] && systemctl is-active --quiet rhcsa-exam-web 2>/dev/null; then
+    echo "Exam paper:  $(head -1 "$RHCSA_STATE/web.urls")"
+  fi
   echo "Started:     $(date -d "@$start" 2>/dev/null || date -r "$start")"
   if (( left > 0 )); then
     printf 'Time left:   %02d:%02d:%02d\n' $((left/3600)) $(((left%3600)/60)) $((left%60))
@@ -423,6 +427,9 @@ cmd_start() {
 }
 
 cmd_tui() {
+  if [[ "${1:-}" == --stop ]]; then
+    require_root tui; _web_service_stop; ok "exam view stopped."; return 0
+  fi
   session_active || die "no active session — run 'rhcsa-sim start' first."
   # Terminal (curses) view — the original; kept as a fallback.
   if [[ "${1:-}" == --text || "${1:-}" == -t ]]; then
@@ -434,10 +441,81 @@ cmd_tui() {
   # actions shell back to this CLI (which needs root), so require root here too.
   require_root tui
   local bin; bin="$(command -v rhcsa-sim 2>/dev/null || echo "$RHCSA_HOME/bin/rhcsa-sim")"
-  exec python3 "$RHCSA_HOME/tui/exam_web.py" \
-       --session "$RHCSA_SESSION" --tasks "$RHCSA_TASKS" --prompts "$RHCSA_PROMPTS_DIR" \
-       --state "$RHCSA_STATE" --hints "$RHCSA_HINTS_DIR" --solutions "$RHCSA_SOLUTIONS_DIR" \
-       --bin "$bin" --port "${RHCSA_WEB_PORT:-8200}" --bind "${RHCSA_WEB_BIND:-0.0.0.0}"
+  local nobrowser=()
+  case "${1:-}" in
+    --serve) nobrowser=(--no-browser) ;&   # run by the systemd unit
+    --foreground|-f)
+      exec python3 "$RHCSA_HOME/tui/exam_web.py" \
+           --session "$RHCSA_SESSION" --tasks "$RHCSA_TASKS" --prompts "$RHCSA_PROMPTS_DIR" \
+           --state "$RHCSA_STATE" --hints "$RHCSA_HINTS_DIR" --solutions "$RHCSA_SOLUTIONS_DIR" \
+           --bin "$bin" --port "${RHCSA_WEB_PORT:-8200}" --bind "${RHCSA_WEB_BIND:-0.0.0.0}" \
+           "${nobrowser[@]}" ;;
+  esac
+  # Default: run the exam view as a systemd service, so it doesn't hold this
+  # terminal, survives Ctrl-C / closing the terminal / SSH drops, and comes back
+  # after a reboot (e.g. 'grade --reboot'). 'reset' stops it.
+  if ! command -v systemctl >/dev/null 2>&1; then
+    warn "systemd not available — running in the foreground instead."
+    cmd_tui --foreground
+  fi
+  _web_service_start "$bin"
+}
+
+_WEB_UNIT=rhcsa-exam-web
+_web_service_start() {
+  local bin="$1" u i
+  cat >"/etc/systemd/system/$_WEB_UNIT.service" <<EOF
+[Unit]
+Description=RHCSA simulator exam paper (browser view)
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=$RHCSA_SESSION
+
+[Service]
+Environment=RHCSA_HOME=$RHCSA_HOME RHCSA_STATE=$RHCSA_STATE
+Environment=RHCSA_WEB_PORT=${RHCSA_WEB_PORT:-8200} RHCSA_WEB_BIND=${RHCSA_WEB_BIND:-0.0.0.0}
+ExecStart=$bin tui --serve
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+EOF
+  rm -f "$RHCSA_STATE/web.urls"
+  systemctl daemon-reload
+  systemctl enable "$_WEB_UNIT" >/dev/null 2>&1
+  systemctl restart "$_WEB_UNIT" || die "could not start the exam view — see: journalctl -u $_WEB_UNIT"
+  for ((i = 0; i < 50; i++)); do [[ -s "$RHCSA_STATE/web.urls" ]] && break; sleep 0.2; done
+  if [[ ! -s "$RHCSA_STATE/web.urls" ]]; then
+    warn "exam view started but has not reported its address yet — see: journalctl -u $_WEB_UNIT"
+    return 0
+  fi
+  echo
+  echo "  RHCSA exam paper (browser):"
+  while read -r u; do echo "      ${C_BOLD}$u${C_OFF}"; done <"$RHCSA_STATE/web.urls"
+  echo "  It runs in the background — this terminal is yours again, and Ctrl-C,"
+  echo "  closing the terminal or rebooting won't stop it. 'rhcsa-sim reset' does;"
+  echo "  or stop it yourself with:  rhcsa-sim tui --stop"
+  echo
+  # Open a browser on this machine's desktop, if there is one.
+  u="$(head -1 "$RHCSA_STATE/web.urls")"
+  if [[ -n "${DISPLAY:-}${WAYLAND_DISPLAY:-}" ]]; then
+    if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != root ]]; then
+      runuser -u "$SUDO_USER" -- env DISPLAY="${DISPLAY:-}" WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-}" \
+        XDG_RUNTIME_DIR="/run/user/$(id -u "$SUDO_USER")" xdg-open "$u" >/dev/null 2>&1 &
+    else
+      xdg-open "$u" >/dev/null 2>&1 &
+    fi
+  fi
+  return 0
+}
+
+_web_service_stop() {
+  command -v systemctl >/dev/null 2>&1 || return 0
+  [[ -f "/etc/systemd/system/$_WEB_UNIT.service" ]] || return 0
+  systemctl disable --now "$_WEB_UNIT" >/dev/null 2>&1
+  rm -f "/etc/systemd/system/$_WEB_UNIT.service" "$RHCSA_STATE/web.urls"
+  systemctl daemon-reload 2>/dev/null
 }
 
 # ---- VM control panel ("Select a VM to control") --------------------------
@@ -846,6 +924,7 @@ _reset_clean() {
     info "Resetting node2 over the controller channel ..."
     _peer_ssh "rhcsa-sim reset --yes$( ((wh)) && printf ' --history')" </dev/null >/dev/null 2>&1 || warn "could not reset node2 (is it up?)."
   fi
+  _web_service_stop
   rm -f "$RHCSA_SESSION" "$RHCSA_STATE/mock.flag" "$RHCSA_STATE/practice.flag" "$RHCSA_STATE/tasktime.json" "$RHCSA_STATE/master.json" "$RHCSA_STATE/marks.json" "$RHCSA_STATE/report.html" "$RHCSA_STATE/report-ready.flag" "$RHCSA_STATE/report-pending.flag" "$RHCSA_STATE/access.conf"
   rm -rf "$RHCSA_RESULTS" "$RHCSA_PARAMS_DIR" "$RHCSA_PROMPTS_DIR" "$RHCSA_HINTS_DIR" "$RHCSA_SOLUTIONS_DIR"
 }
@@ -1527,7 +1606,7 @@ cmd_master() {   # rhcsa-sim master TASK   (run again after each attempt; --stop
   if [[ "$t" == --stop || "$t" == stop ]]; then
     local cur; cur="$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("task",""))' "$STATE" 2>/dev/null)"
     [[ -n "$cur" ]] && _reseed_task_fresh "$cur" >/dev/null 2>&1
-    rm -f "$STATE" "$RHCSA_SESSION"; ok "mastery storm stopped."; return 0
+    _web_service_stop; rm -f "$STATE" "$RHCSA_SESSION"; ok "mastery storm stopped."; return 0
   fi
   task_exists "$t" || die "unknown task: $t  (try: rhcsa-sim list)"
   is_crossnode_task "$t" && die "'$t' is a two-node task — mastery storms drill single-node tasks only."
