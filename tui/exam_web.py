@@ -2,7 +2,8 @@
 """RHCSA simulator — browser exam paper ("Red Hat Test Exam"), faithful to the
 real EX200 remote-exam interface. Python 3 standard library ONLY (offline-safe).
 
-Served on 127.0.0.1 by `rhcsa-sim tui`. Read-only paper + a VM control panel;
+Served on all interfaces (0.0.0.0, port 8200) by `rhcsa-sim tui`, so other PCs on
+the LAN can open it; set RHCSA_WEB_BIND=127.0.0.1 to keep it local-only. Read-only paper + a VM control panel;
 actions (check / hint / solution / vm) shell out to the rhcsa-sim CLI so all the
 tested logic (node2 forwarding, practice gating, reset) is reused, not duplicated.
 
@@ -693,6 +694,49 @@ class H(BaseHTTPRequestHandler):
             self._send("404", "text/plain", 404)
 
 
+def lan_ips():
+    """Non-loopback IPv4 addresses of this host, primary (default-route) first."""
+    ips = []
+    try:
+        out = subprocess.run(["hostname", "-I"], capture_output=True, text=True, timeout=3).stdout
+        ips = [a for a in out.split() if "." in a and not a.startswith("127.")]
+    except Exception:
+        pass
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("192.0.2.1", 9))  # no packet is sent; just picks the outbound iface
+        primary = s.getsockname()[0]
+        s.close()
+        if primary and not primary.startswith("127."):
+            ips = [primary] + [a for a in ips if a != primary]
+    except Exception:
+        pass
+    return ips
+
+
+def open_firewall(port):
+    """Open the exam-view port in firewalld, permanent AND runtime, so other PCs
+    can reach it across reboots. Runtime is added directly rather than via
+    --reload, which would drop the student's own not-yet-saved runtime rules.
+    Graders only look for the ports a task asks for, and the deep reset keeps
+    this one (lib/common.sh), so the extra rule never affects grading."""
+    def fw(*a):
+        return subprocess.run(["firewall-cmd"] + list(a), capture_output=True, timeout=10).returncode == 0
+    try:
+        if not fw("--state"):
+            return
+        p = "%d/tcp" % port
+        if not fw("--permanent", "--query-port=" + p):
+            fw("--permanent", "--add-port=" + p)
+        if not fw("--query-port=" + p):
+            fw("--add-port=" + p)
+        if not fw("--query-port=" + p):
+            print("  NOTE: could not open %s in firewalld; other PCs may not reach it.\n" % p)
+    except Exception:
+        pass
+
+
 def main():
     global ARGS
     ap = argparse.ArgumentParser()
@@ -704,13 +748,14 @@ def main():
     ap.add_argument("--solutions", default="")
     ap.add_argument("--bin", default="rhcsa-sim")
     ap.add_argument("--port", type=int, default=8200)
+    ap.add_argument("--bind", default="0.0.0.0")
     ap.add_argument("--no-browser", action="store_true")
     ARGS = ap.parse_args()
 
     srv = None
     for port in range(ARGS.port, ARGS.port + 12):
         try:
-            srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+            srv = ThreadingHTTPServer((ARGS.bind, port), H)
             ARGS.port = port
             break
         except OSError:
@@ -718,9 +763,18 @@ def main():
     if srv is None:
         print("could not bind a port in %d..%d" % (ARGS.port, ARGS.port + 12), file=sys.stderr)
         sys.exit(1)
-    url = "http://localhost:%d/" % ARGS.port
+    if ARGS.bind in ("0.0.0.0", "", "::"):
+        ips = lan_ips() or ["127.0.0.1"]
+    else:
+        ips = [ARGS.bind]
+    urls = ["http://%s:%d/" % (ip, ARGS.port) for ip in ips]
+    url = urls[0]
     print("\n  RHCSA exam paper (browser):  %s" % url)
+    for u in urls[1:]:
+        print("                               %s" % u)
     print("  Leave this running; press Ctrl-C to close the exam view.\n")
+    if ARGS.bind not in ("127.0.0.1", "localhost", "::1"):
+        open_firewall(ARGS.port)
     disp = os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")
     if not ARGS.no_browser and disp:
         # The server runs as root (it needs root for check/vm), but a browser must

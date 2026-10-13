@@ -696,9 +696,16 @@ _deep_reset_local() {
   systemctl try-restart httpd 2>/dev/null
 
   # --- firewall: drop sim-added ports + non-base services, but KEEP ssh and the
-  #     base zone services so a reset can never lock you out. --------------------
+  #     base zone services so a reset can never lock you out. Also keep the
+  #     browser exam view's port (8200..8211, tui/exam_web.py) so other PCs on
+  #     the LAN can still reach it. -----------------------------------------------
   if command -v firewall-cmd >/dev/null 2>&1; then
-    for p in $(firewall-cmd --permanent --list-ports 2>/dev/null); do firewall-cmd --permanent --remove-port="$p" >/dev/null 2>&1; done
+    local _webp="${RHCSA_WEB_PORT:-8200}"
+    for p in $(firewall-cmd --permanent --list-ports 2>/dev/null); do
+      case "$p" in */tcp) n="${p%/tcp}"
+        [[ "$n" =~ ^[0-9]+$ ]] && (( n >= _webp && n < _webp + 12 )) && continue;; esac
+      firewall-cmd --permanent --remove-port="$p" >/dev/null 2>&1
+    done
     for c in $(firewall-cmd --permanent --list-services 2>/dev/null); do
       case " ssh dhcpv6-client mdns samba-client cockpit " in *" $c "*) continue;; esac
       firewall-cmd --permanent --remove-service="$c" >/dev/null 2>&1
