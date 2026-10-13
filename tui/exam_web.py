@@ -772,6 +772,11 @@ def main():
     print("\n  RHCSA exam paper (browser):  %s" % url)
     for u in urls[1:]:
         print("                               %s" % u)
+    try:  # `rhcsa-sim tui` (background service) reads this to show the URLs
+        with open(os.path.join(ARGS.state, "web.urls"), "w") as f:
+            f.write("\n".join(urls) + "\n")
+    except Exception:
+        pass
     print("  Leave this running; press Ctrl-C to close the exam view.\n")
     if ARGS.bind not in ("127.0.0.1", "localhost", "::1"):
         open_firewall(ARGS.port)
