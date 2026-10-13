@@ -425,7 +425,7 @@ cmd_tui() {
   exec python3 "$RHCSA_HOME/tui/exam_web.py" \
        --session "$RHCSA_SESSION" --tasks "$RHCSA_TASKS" --prompts "$RHCSA_PROMPTS_DIR" \
        --state "$RHCSA_STATE" --hints "$RHCSA_HINTS_DIR" --solutions "$RHCSA_SOLUTIONS_DIR" \
-       --bin "$bin" --port "${RHCSA_WEB_PORT:-8200}"
+       --bin "$bin" --port "${RHCSA_WEB_PORT:-8200}" --bind "${RHCSA_WEB_BIND:-0.0.0.0}"
 }
 
 # ---- VM control panel ("Select a VM to control") --------------------------

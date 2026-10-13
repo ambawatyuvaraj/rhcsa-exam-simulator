@@ -39,7 +39,8 @@ rand_password() {       # 10-char alnum
   tr -dc 'A-Za-z0-9' </dev/urandom 2>/dev/null | head -c 10 || echo "Pass$(rand_int 1000 9999)x"
 }
 rand_port() {           # an uncommon high port not already labelled by SELinux
-  echo "$(rand_choice 82 808 1234 3000 5000 5001 6080 7000 8008 8200 9000 9090 9100)"
+  # (never 8200..8211 — reserved for the browser exam view, tui/exam_web.py)
+  echo "$(rand_choice 82 808 1234 3000 5000 5001 6080 7000 8008 9000 9090 9100)"
 }
 rand_size_mib() {       # rand from a set, in MiB
   echo "$(rand_choice 256 300 384 400 450 500 512 600 640 768)"
