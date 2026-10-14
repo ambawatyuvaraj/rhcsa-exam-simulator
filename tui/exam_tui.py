@@ -147,7 +147,10 @@ def draw(stdscr, ex):
         rem = ex.remaining()
         tstr = f"{max(0,rem)//3600:02d}:{(max(0,rem)%3600)//60:02d}:{max(0,rem)%60:02d}"
         tcol = curses.color_pair(2) if rem > 600 else curses.color_pair(3)
-        if rem <= 0:
+        if ex.duration <= 0:   # untimed practice: show elapsed time instead
+            el = max(0, int(time.time()) - ex.start)
+            tstr = f"+{el//3600:02d}:{(el%3600)//60:02d}:{el%60:02d}"; tcol = curses.color_pair(2)
+        elif rem <= 0:
             tstr = "EXPIRED"; tcol = curses.color_pair(3)
         title = f" RHCSA EX200 SIMULATOR — exam:{ex.exam} "
         stdscr.attron(curses.color_pair(1) | curses.A_BOLD)
@@ -161,7 +164,7 @@ def draw(stdscr, ex):
         # candidate would do in their head).
         n_done = sum(1 for v in ex.status.values() if v) if ex.practice else 0
         n_left = max(1, len(ex.tasks) - n_done)
-        pace = f"~{max(0, rem) / 60 / n_left:.1f}m/task · "   # leftmost: never truncated
+        pace = f"~{max(0, rem) / 60 / n_left:.1f}m/task · " if ex.duration > 0 else ""   # leftmost: never truncated
         if ex.practice:
             done_hint = pace + ("↑↓ u/d scroll · h hint · s solution · c check · "
                                 "p check ALL · m mark · q quit")
@@ -293,8 +296,11 @@ def main():
     ex = Exam(a.session, a.tasks, a.prompts, a.state)
     curses.wrapper(draw, ex)
     rem = ex.remaining()
-    print(f"Exam paper closed. Time remaining: "
-          f"{max(0,rem)//3600:02d}:{(max(0,rem)%3600)//60:02d}:{max(0,rem)%60:02d}")
+    if ex.duration <= 0:
+        print("Exam paper closed (untimed practice).")
+    else:
+        print(f"Exam paper closed. Time remaining: "
+              f"{max(0,rem)//3600:02d}:{(max(0,rem)%3600)//60:02d}:{max(0,rem)%60:02d}")
     print("The exam is still active. Grade with:  rhcsa-sim grade --reboot")
 
 if __name__ == "__main__":

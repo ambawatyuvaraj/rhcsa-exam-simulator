@@ -308,12 +308,16 @@ var END=%d, NOW0=%d, T0=Date.now()/1000;
 function fmt(s){ if(s<=0) return "Time's up"; s=Math.floor(s);
   var h=Math.floor(s/3600), m=Math.floor((s%%3600)/60), sec=s%%60, p=function(n){return(n<10?'0':'')+n;};
   return (s<300)? (m+':'+p(sec)) : (h+':'+p(m)); }
-function tick(){ var rem=END-NOW0-(Date.now()/1000-T0); var el=document.getElementById('timer');
-  if(!el) return; el.textContent='Time remaining: '+fmt(rem); el.className=(rem<300)?'timer low':'timer'; }
+var UNTIMED=%s, START=%d;
+function tick(){ var el=document.getElementById('timer'); if(!el) return;
+  if(UNTIMED){ var e=Math.max(0,Math.floor(NOW0-START+(Date.now()/1000-T0))), h=Math.floor(e/3600), m=Math.floor((e%%3600)/60);
+    el.textContent='Practice (untimed) · '+h+':'+(m<10?'0':'')+m+' elapsed'; el.className='timer'; return; }
+  var rem=END-NOW0-(Date.now()/1000-T0);
+  el.textContent='Time remaining: '+fmt(rem); el.className=(rem<300)?'timer low':'timer'; }
 setInterval(tick,1000); tick();
 function postMark(id,st){ fetch('/api/mark',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
   body:'id='+encodeURIComponent(id)+'&state='+st}); }
-</script>""" % ((start + dur), int(time.time()))
+</script>""" % ((start + dur), int(time.time()), "true" if dur <= 0 else "false", start)
 
 
 def page(title, sess, body):

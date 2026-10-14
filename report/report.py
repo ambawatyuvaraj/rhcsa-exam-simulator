@@ -92,9 +92,12 @@ def print_text(r):
           f"{datetime.datetime.fromtimestamp(r['graded_at']):%Y-%m-%d %H:%M:%S}")
     if r["start"]:
         used = r["graded_at"] - int(r["start"])
-        over = used > int(r["duration"])
-        t = fmt_time(used) + (col("  (OVER TIME)", "red") if over else "")
-        print(f"  Time used: {t}  of {fmt_time(r['duration'])}")
+        dur = int(r["duration"] or 0)
+        if dur <= 0:
+            print(f"  Time used: {fmt_time(used)}  (untimed practice)")
+        else:
+            t = fmt_time(used) + (col("  (OVER TIME)", "red") if used > dur else "")
+            print(f"  Time used: {t}  of {fmt_time(dur)}")
     print(col("-" * 64, "dim"))
     for row in r["rows"]:
         if not row["graded"]:
@@ -143,7 +146,7 @@ th{{background:#0b3d91;color:#fff}} tr.fail td{{background:#fff6f6}} tr.pass td{
 .ok{{color:#0a7a0a}} .no{{color:#a30000}} .bar{{height:.8rem;background:#e1e4ea;border-radius:4px;overflow:hidden;width:160px;display:inline-block;vertical-align:middle}}
 .fill{{height:100%}} .meta{{color:#555}}</style></head><body>
 <h1>RHCSA EX200 Simulator — Report</h1>
-<p class="meta">Exam <b>{exam}</b> · graded {graded} · time used {used} of {dur}</p>
+<p class="meta">Exam <b>{exam}</b> · graded {graded} · time used {used}{dur}</p>
 <p><span class="verdict {vcls}">{score}/300 &nbsp; {verdict}</span>
 &nbsp; {pct}% (need {need}/300) · checkpoint partial {psum}/{pmax}</p>
 <h2>Tasks</h2><table><tr><th>#</th><th>Task</th><th>Domain</th><th>Score</th><th>Result</th><th>Checkpoints</th></tr>
@@ -184,7 +187,7 @@ def write_html(r, reports_dir, stamp):
     out = HTML_TPL.format(
         exam=html.escape(str(r["exam"])),
         graded=datetime.datetime.fromtimestamp(r["graded_at"]).strftime("%Y-%m-%d %H:%M"),
-        used=fmt_time(used), dur=fmt_time(r["duration"]),
+        used=fmt_time(used), dur=(" of " + fmt_time(r["duration"])) if int(r["duration"] or 0) > 0 else " (untimed practice)",
         vcls="pass" if r["passed"] else "fail",
         score=r["score300"], verdict="PASS" if r["passed"] else "FAIL",
         pct=r["pct"], need=round(3 * r["pass_pct"]),

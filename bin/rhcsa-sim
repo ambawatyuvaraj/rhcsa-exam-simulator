@@ -27,7 +27,9 @@ ${C_BOLD}${C_YEL}QUICK START${C_OFF}
   sudo rhcsa-sim reset                   wipe all practice changes on BOTH nodes
 
 ${C_BOLD}TAKE AN EXAM${C_OFF}
-  start EXAM|random        seed + start the 150-min countdown   (papers: rhcsa-sim list)
+  start EXAM|random [--exam|--practice]          (papers: rhcsa-sim list)
+                           --exam (default): timed 150-min countdown, no aids
+                           --practice: untimed, hints/solutions/check on
   mock [EXAM]              dress rehearsal — aid-free, counts toward your readiness score
   tui                      open the exam paper in a browser (the real Exam View) — runs in the
                            background (tui --stop to close) · tui --text = terminal
@@ -38,8 +40,8 @@ ${C_BOLD}TAKE AN EXAM${C_OFF}
   review                   AFTER grading: walk each failed task — what failed + the solution
 
 ${C_BOLD}PRACTICE & LEARN${C_OFF}  ${C_DIM}(aids exist here only — exams stay aid-free)${C_OFF}
-  practice CATEGORY        ~20 tasks of ONE topic, with aids enabled
-  practice EXAM            a FULL exam in PRACTICE mode — aids on (any exam, 1- or 2-node)
+  practice CATEGORY        ~20 tasks of ONE topic, untimed, with aids enabled
+  practice EXAM            same as: start EXAM --practice (untimed, aids on; 1- or 2-node)
   practice weak            tasks you failed recently or never tried (from your history)
   drill [CATEGORY]         ONE random task against a 7-minute clock
   master TASK              mastery storm: ONE task, fresh values, until 3 straight passes
@@ -101,6 +103,10 @@ cmd_list() {
   done < <(all_tasks)
 }
 
+_dur_label() {   # "150 minutes" | "untimed"
+  if (( ${1:-0} > 0 )); then echo "$(( $1 / 60 )) minutes"; else echo "untimed"; fi
+}
+
 cmd_status() {
   if ! session_active; then echo "No active exam session."; return 0; fi
   local start dur exam now left
@@ -111,13 +117,16 @@ cmd_status() {
     echo "Exam paper:  $(head -1 "$RHCSA_STATE/web.urls")"
   fi
   echo "Started:     $(date -d "@$start" 2>/dev/null || date -r "$start")"
-  if (( left > 0 )); then
+  if (( dur <= 0 )); then
+    local el=$(( now - start ))
+    printf 'Time:        untimed (practice) — %02d:%02d:%02d elapsed\n' $((el/3600)) $(((el%3600)/60)) $((el%60))
+  elif (( left > 0 )); then
     printf 'Time left:   %02d:%02d:%02d\n' $((left/3600)) $(((left%3600)/60)) $((left%60))
   else
     echo "Time left:   ${C_RED}EXPIRED${C_OFF}"
   fi
   echo "Tasks:       $(session_field tasks | wc -l)"
-  if [[ "$exam" == practice-* ]]; then
+  if [[ "$exam" == practice-* || -f "$RHCSA_STATE/practice.flag" ]]; then
     echo "Mode:        practice — aids available: ${C_BOLD}rhcsa-sim hint N${C_OFF} · ${C_BOLD}solution N${C_OFF} · ${C_BOLD}check N${C_OFF}  (and h/s/c in the TUI)"
   fi
 }
@@ -276,7 +285,7 @@ EOF
   local _r1=0 _t; for _t in "${n1[@]}"; do [[ "$_t" == root-password ]] && _r1=1; done; _record_access "$_r1"
   (( failed > 0 )) && warn "$failed node1 task(s) had setup issues."
   if (( practice )); then
-    ok "Two-node PRACTICE '$sel' started — node1: ${#n1[@]} tasks (here), node2: ${#n2[@]} tasks (seeded on node2)."
+    ok "Two-node PRACTICE '$sel' started ($(_dur_label "$dur")) — node1: ${#n1[@]} tasks (here), node2: ${#n2[@]} tasks (seeded on node2)."
     _aids_banner
   else
     ok "Two-node exam '$sel' started — node1: ${#n1[@]} tasks (here), node2: ${#n2[@]} tasks (seeded on node2)."
@@ -312,19 +321,24 @@ cmd_start() {
   # Ensure the offline DVD repo (if configured) is actually mounted before
   # seeding — task setups dnf-install packages from it.
   _ensure_local_repo_mounted 2>/dev/null || true
-  local role="" sel="" dur="${RHCSA_DURATION:-$DURATION_DEFAULT}" practice=0
+  local role="" sel="" dur="${RHCSA_DURATION:-$DURATION_DEFAULT}" practice=0 asked_exam=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --role)     role="$2"; shift 2;;
       --practice) practice=1; shift;;
+      --exam)     asked_exam=1; shift;;
       *)          sel="$1"; shift;;
     esac
   done
+  (( practice && asked_exam )) && die "choose ONE mode: --exam (timed, no aids) or --practice (untimed, aids on)."
   # Accept a two-node paper's file name ("exam-x.2node"): with the suffix,
   # "$sel.list" resolves to the .2node file and is_node_exam fails, so the
   # "<node> <task>" lines were read as task ids "node1"/"node2" and nothing seeded.
   sel="${sel%.2node}"
   [[ "${_RHCSA_PRACTICE:-}" == 1 ]] && practice=1
+  # Practice is untimed (duration 0) unless RHCSA_DURATION asks for a clock;
+  # exam mode (the default, or --exam) keeps the real 150-minute countdown.
+  (( practice )) && dur="${RHCSA_DURATION:-0}"
   if [[ -z "$sel" ]]; then [[ "$RHCSA_RHEL" == 10 ]] && sel=exam-r10-01 || sel=exam-01; fi
   # Validate the name BEFORE the self-clean below: a typo must not wipe the VM.
   case "$sel" in
@@ -410,12 +424,12 @@ cmd_start() {
   session_write "$sel" "$dur" "$(date +%s)" "${tasks[@]}"
   local _r1=0 _t; for _t in "${tasks[@]}"; do [[ "$_t" == root-password ]] && _r1=1; done; _record_access "$_r1"
   if (( practice )); then
-    ok "PRACTICE '$sel' started — ${#tasks[@]} tasks."
+    ok "PRACTICE '$sel' started — ${#tasks[@]} tasks, $(_dur_label "$dur")."
     _aids_banner
     echo
-    echo "Open the paper + timer:  ${C_BOLD}rhcsa-sim tui${C_OFF}    ·    grade all: ${C_BOLD}rhcsa-sim grade${C_OFF}"
+    echo "Open the paper:  ${C_BOLD}rhcsa-sim tui${C_OFF}    ·    grade all: ${C_BOLD}rhcsa-sim grade${C_OFF}"
   else
-    ok "Exam '$sel' started — ${#tasks[@]} tasks, $((dur/60)) minutes."
+    ok "Exam '$sel' started — ${#tasks[@]} tasks, $(_dur_label "$dur")."
     echo
     echo "Open the exam paper + timer with:  ${C_BOLD}rhcsa-sim tui${C_OFF}"
     echo "When finished:                     ${C_BOLD}rhcsa-sim grade --reboot${C_OFF}"
@@ -1026,8 +1040,8 @@ cmd_practice() {
     fi
   done
   (( failed > 0 )) && warn "$failed task(s) had setup issues."
-  session_write "practice-${dom}" "${RHCSA_DURATION:-3600}" "$(date +%s)" "${tasks[@]}"
-  ok "Category practice '${dom}' started — ${#tasks[@]} tasks, $(( ${RHCSA_DURATION:-3600} / 60 )) min."
+  session_write "practice-${dom}" "${RHCSA_DURATION:-0}" "$(date +%s)" "${tasks[@]}"
+  ok "Category practice '${dom}' started — ${#tasks[@]} tasks, $(_dur_label "${RHCSA_DURATION:-0}")."
   _aids_banner
   echo "Read tasks:  ${C_BOLD}rhcsa-sim tui${C_OFF}    Grade:  ${C_BOLD}rhcsa-sim grade${C_OFF}    Report:  ${C_BOLD}rhcsa-sim report${C_OFF}"
   if [[ -t 0 && -t 1 ]]; then read -r -p "Launch the practice paper now? [Y/n] " a; [[ "$a" =~ ^[Nn] ]] || cmd_tui; fi
