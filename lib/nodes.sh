@@ -65,6 +65,8 @@ EOF
   # so a wrong SELinux label on authorized_keys (e.g. default_t on a cloned VM)
   # would silently break key auth. Ensure the dir exists, is 700, and carries
   # the ssh_home_t context. Idempotent and safe to run on every node-setup.
+  ensure_student
+
   mkdir -p /root/.ssh && chmod 700 /root/.ssh
   [[ -f /root/.ssh/authorized_keys ]] && chmod 600 /root/.ssh/authorized_keys
   command -v restorecon >/dev/null 2>&1 && restorecon -RF /root/.ssh 2>/dev/null || true
@@ -87,6 +89,33 @@ EOF
 # for ALL cross-node operations using THIS non-root sudo user instead of root,
 # so exam tasks that harden root SSH (PermitRootLogin no) cannot break grading.
 # Idempotent; safe to run on every node-setup.
+# The exam paper tells the candidate to log in as student / password and use
+# 'sudo -i' (it is how node2 is reached once a task disables root SSH), but
+# nothing created that account — so make it true. Run at node-setup and before
+# every exam is seeded, on each node, so a task or a VM built with a different
+# admin user can't leave the documented login broken. Reset keeps 'student'.
+RHCSA_STUDENT_PW="${RHCSA_STUDENT_PW:-password}"
+ensure_student() {
+  id student >/dev/null 2>&1 || useradd -m -s /bin/bash student 2>/dev/null || return 0
+  echo "student:$RHCSA_STUDENT_PW" | chpasswd 2>/dev/null   # root: pwquality only warns
+  usermod -aG wheel student 2>/dev/null
+  chage -M 99999 -E -1 student 2>/dev/null                 # never expired / aged out
+  command -v faillock >/dev/null 2>&1 && faillock --user student --reset 2>/dev/null
+  # Cloud/minimal images often ship 'PasswordAuthentication no'. Allow it for
+  # student only (no task touches this setting); sshd uses the first value it
+  # reads, so the 00- drop-in wins. Validate before reloading so a bad config
+  # can never take sshd down.
+  local dropin=/etc/ssh/sshd_config.d/00-rhcsa-student.conf
+  if [[ -d /etc/ssh/sshd_config.d && ! -f "$dropin" ]] && command -v sshd >/dev/null 2>&1 \
+     && sshd -T -C user=student,host=localhost,addr=127.0.0.1 2>/dev/null | grep -qi '^passwordauthentication no'; then
+    printf 'Match User student\n    PasswordAuthentication yes\n' >"$dropin"
+    chmod 600 "$dropin"
+    if sshd -t 2>/dev/null; then systemctl reload sshd 2>/dev/null || true
+    else rm -f "$dropin"; fi
+  fi
+  return 0
+}
+
 ensure_rhcsactl() {
   id rhcsactl >/dev/null 2>&1 || useradd -m -s /bin/bash rhcsactl 2>/dev/null
   install -d -m 700 -o rhcsactl -g rhcsactl /home/rhcsactl/.ssh 2>/dev/null

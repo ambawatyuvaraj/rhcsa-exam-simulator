@@ -196,6 +196,7 @@ _preseed() {
     _reset_clean
   fi
   mkdir -p "$RHCSA_STATE"
+  ensure_student   # the paper's student / password login (lib/nodes.sh)
   if   (( practice ));                 then : >"$RHCSA_STATE/practice.flag"; rm -f "$RHCSA_STATE/mock.flag" 2>/dev/null
   elif [[ "${_RHCSA_MOCK:-}" == 1 ]];  then : >"$RHCSA_STATE/mock.flag";     rm -f "$RHCSA_STATE/practice.flag" 2>/dev/null
   else rm -f "$RHCSA_STATE/mock.flag" "$RHCSA_STATE/practice.flag" 2>/dev/null; fi
