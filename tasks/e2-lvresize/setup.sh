@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Pre-create the myvol VG + vo LV (~200 MiB ext4) with data, on its OWN disk
-# (separate from the swap+myvg shared disk). The candidate extends vo to 300 MiB.
+# Pre-create the myvol VG + vo LV (~200 MiB ext4) with data on partition 1 of
+# the SHARED storage disk (vdb1), leaving the rest free for the swap (vdb3) and
+# myvg (vdb2) tasks — one spare disk is enough. The candidate extends vo to 300 MiB.
 . "$RHCSA_LIB/storage-prep.sh"
-dev="$(ensure_spare_disk)" || { echo "e2-lvresize: could not provide a spare disk"; exit 1; }
+dev="$(seed_partition e2storage 400M)" || { echo "e2-lvresize: could not provide a spare disk"; exit 1; }
 if ! vgs myvol >/dev/null 2>&1; then
   pvcreate -ff -y "$dev" >/dev/null 2>&1
   vgcreate myvol "$dev" >/dev/null 2>&1

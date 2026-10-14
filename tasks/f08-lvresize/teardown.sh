@@ -5,5 +5,5 @@ sed -i '\#/mnt/wlogic#d' /etc/fstab 2>/dev/null
 lvremove -f wgroup >/dev/null 2>&1
 vgremove -f wgroup >/dev/null 2>&1
 rm -rf /mnt/wlogic 2>/dev/null
-spare_cleanup
+shared_cleanup f08storage
 exit 0
