@@ -6,8 +6,8 @@
 # chrony-iburst carries the dump's `pool ... iburst`.
 # NOTE: the dump names BOTH LVM volume groups "wgroup" (Q21 wlogic + Q23 wshare),
 # so they are placed on different nodes (a VG name is unique per machine).
-# Disk claims (in list order): node1 f08-lvcreate->1st spare; node2 f08-swap->1st,
-# f08-lvresize->2nd.
+# Disk claims: node1 f08-lvcreate -> its spare disk; node2 f08-swap + f08-lvresize
+# share ONE spare disk (wgroup on partition 1, the candidate's swap on another).
 # format: "<node> <task-id>"   (trailing "# Qn" maps to the dump question)
 
 # ---- node1 : servera — containers (walhalla) + compute + LVM ----

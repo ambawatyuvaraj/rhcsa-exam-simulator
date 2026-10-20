@@ -153,6 +153,26 @@ ensure_shared_disk() {
   local d; d="$(_find_unused_disk)" || return 1
   echo "$d" >"$rec"; echo "$d"; return 0
 }
+# Give a task that SEEDS a pre-existing VG (the "resize this LV" tasks) its own
+# first partition on the group's shared disk, instead of turning the whole disk
+# into a PV. The rest of the disk stays free for the candidate's own swap/LVM
+# partitions, so an exam needs only ONE spare disk — the answer-key layout is
+# /dev/vdb1 = existing VG, vdb2 = new LVM, vdb3 = swap. Idempotent: an existing
+# first partition is reused. Prints the partition device.
+seed_partition() {   # seed_partition <group> <size, e.g. 400M>
+  local group="$1" size="$2" d p
+  d="$(ensure_shared_disk "$group")" || return 1
+  _first_part() { lsblk -lnpo NAME,TYPE "$1" 2>/dev/null | awk '$2=="part"{print $1; exit}'; }
+  p="$(_first_part "$d")"
+  if [[ -z "$p" ]]; then
+    printf 'label: dos\n,%s,8e\n' "$size" | sfdisk -q -W always "$d" >/dev/null 2>&1 || return 1
+    partprobe "$d" >/dev/null 2>&1; udevadm settle 2>/dev/null
+    p="$(_first_part "$d")"
+  fi
+  [[ -b "$p" ]] || return 1
+  echo "$p"
+}
+
 shared_cleanup() {   # $1=group : wipe the shared disk back to bare + drop the claim
   local group="${1:?shared_cleanup: group required}"; local rec="$CLAIMS_DIR/shared-$group.dev"
   [[ -s "$rec" ]] && _wipe_spare_disk "$(cat "$rec")"
