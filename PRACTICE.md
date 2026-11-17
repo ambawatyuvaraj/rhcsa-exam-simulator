@@ -3,20 +3,16 @@
 A practical, day‑to‑day guide for practising with the simulator. For install,
 architecture, and the full command reference see **README.md**.
 
-> Run `rhcsa-sim` **inside the VM as root** (`sudo -i`). For two‑node exams run
-> everything on **node1**; do `②`‑tagged tasks on node2 (`ssh student@node2.example.com`,
-> then `sudo -i`). `virsh` commands run on the **host**.
+> Run `rhcsa-sim` **inside the VM** with `sudo` (or as root after `sudo -i`). For
+> two‑node exams run everything on **node1**, and do node2's tasks on node2
+> (`ssh student@node2.example.com`, then `sudo -i`). `virsh` commands run on the **host**.
 
-## 0. One‑time setup (per VM)
+## 0. One‑time setup
 
-```bash
-sudo ./install.sh                 # deploys + (if a DVD ISO is attached) configures the offline repo
-sudo rhcsa-sim local-repo         # offline DVD repo + boot‑mount service (if not auto‑configured)
-# two‑node only — declare roles on each VM:
-sudo rhcsa-sim node-setup --role node1 --peer <node2-ip>   # on node1
-sudo rhcsa-sim node-setup --role node2 --peer <node1-ip>   # on node2
-sudo rhcsa-sim doctor             # must be GREEN before you start
-```
+Follow the README with screenshots: **[prepare the VM](README.md#1-prepare-the-vm)**,
+**[install](README.md#2-install-the-simulator)**, and for two‑node exams
+**[pair the VMs](README.md#4-two-node-exam)** (root SSH key, `node-setup` on both,
+then `doctor` must be green on both).
 
 ## 1. Choose how to practise
 
