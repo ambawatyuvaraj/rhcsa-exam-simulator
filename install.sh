@@ -92,7 +92,10 @@ chmod 755 /var/lib/rhcsa-sim 2>/dev/null || true   # student must read report.ht
 if id student >/dev/null 2>&1; then
   shome="$(getent passwd student | cut -d: -f6)"
   if [[ -n "$shome" ]]; then
-    install -d -o student -g student "$shome/.config/autostart" 2>/dev/null || true
+    # Name ~/.config too: install -d makes missing parents root-owned, and a
+    # root-owned ~/.config stops student creating ~/.config/systemd/user (every
+    # rootless container-service task). Re-running this also repairs that.
+    install -d -o student -g student "$shome/.config" "$shome/.config/autostart" 2>/dev/null || true
     cat > "$shome/.config/autostart/rhcsa-report.desktop" <<DESK
 [Desktop Entry]
 Type=Application
