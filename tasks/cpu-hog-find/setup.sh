@@ -9,7 +9,7 @@ rm -f "/root/$OUT"
 pkill -9 -f 'cpuhog -c' 2>/dev/null
 rm -f "$PIDF"
 
-bash -c 'exec -a cpuhog sh -c "while :; do :; done"' &
+bash -c 'exec -a cpuhog sh -c "while :; do :; done"' >/dev/null 2>&1 &   # detach from stdout, or a piped "rhcsa-sim start" never ends
 newpid=$!
 echo "$newpid" > "$PIDF"
 echo "cpu-hog-find: started cpuhog (pid $newpid)"

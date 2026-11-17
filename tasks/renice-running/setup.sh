@@ -13,7 +13,7 @@ if [ -f "$PIDF" ]; then
 fi
 
 # Start a fresh tagged sleep at nice 0.
-nice -n 0 bash -c "exec -a $MARK sleep 9000" &
+nice -n 0 bash -c "exec -a $MARK sleep 9000" >/dev/null 2>&1 &   # detach from stdout, or a piped "rhcsa-sim start" never ends
 newpid=$!
 echo "$newpid" > "$PIDF"
 echo "renice-running: started '$MARK' process (pid $newpid) at nice 0"
