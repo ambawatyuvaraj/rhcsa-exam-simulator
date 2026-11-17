@@ -55,6 +55,16 @@ gen_task_params() {     # gen_task_params <task-id> <task-dir>
   [[ -f "$dir/params.sh" ]] || return 0       # task isn't parameterised
   RHCSA_LIB="${RHCSA_LIB:-$(dirname "${BASH_SOURCE[0]}")}" \
     bash "$dir/params.sh" >"$out" 2>/dev/null || : >"$out"
+  # Users, groups and output files drawn from small sets can repeat across tasks
+  # (two tasks both writing /root/lines.txt, alice42 with two specs); redraw until
+  # none of them is already taken by another task this session.
+  local keys='^(U|G|OUT|OUTF|F|SCRIPT|ARC|SRCNAME|TARNAME)=' mine taken try=0
+  taken="$(cat $(ls "$RHCSA_PARAMS_DIR"/*.env 2>/dev/null | grep -vxF "$out") /dev/null | grep -E "$keys" | cut -d= -f2-)"
+  while mine="$(grep -E "$keys" "$out" | cut -d= -f2-)" && [[ -n "$mine" && -n "$taken" ]] && (( try++ < 10 )) \
+        && grep -qxFf <(printf '%s\n' "$mine") <<<"$taken"; do
+    RHCSA_LIB="${RHCSA_LIB:-$(dirname "${BASH_SOURCE[0]}")}" \
+      bash "$dir/params.sh" >"$out" 2>/dev/null || : >"$out"
+  done
   # Make "name-like" values unique per task (append a short per-task token) so
   # several tasks in one exam never collide on a mountpoint/VG/LV/dir/label.
   # Only identifier params the candidate *creates* are touched; service names,
