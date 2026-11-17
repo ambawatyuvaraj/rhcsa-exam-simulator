@@ -2,4 +2,5 @@
 sed -i "/^$U$/d" /etc/at.deny 2>/dev/null
 [ -f /etc/at.allow.rhcsabak ] && mv -f /etc/at.allow.rhcsabak /etc/at.allow 2>/dev/null
 userdel -rf "$U" >/dev/null 2>&1
+restorecon -F /etc/at.allow 2>/dev/null   # mv keeps the backup's label; put the file's own back
 exit 0
