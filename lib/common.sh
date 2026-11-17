@@ -447,7 +447,7 @@ UNIT
     # working repo exists. NOT the graded package-install/package-group targets
     # (tree/tcpdump/cockpit/make/…) — those stay for the candidate to install.
     info "Installing core task packages from the local repo ..."
-    dnf -y install podman nfs-utils autofs chrony httpd tuned acl lvm2 at rsync-daemon createrepo_c xorriso quota firefox xdg-utils >/dev/null 2>&1 || true
+    dnf -y install podman nfs-utils autofs chrony httpd tuned acl lvm2 at rsync-daemon createrepo_c xorriso quota dosfstools firefox xdg-utils >/dev/null 2>&1 || true
     ok "Core task packages ready (podman, nfs-utils, autofs, httpd, …)."
     return 0
   fi

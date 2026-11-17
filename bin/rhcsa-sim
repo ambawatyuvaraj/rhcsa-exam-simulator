@@ -16,15 +16,19 @@ DURATION_DEFAULT=9000   # 2h30m, the real EX200 length (seconds)
 PASS_PCT=70             # 210/300
 
 usage() {
+  # Name papers that exist on THIS release (RHEL 10 has no exam-01/exam-2node-01).
+  local one=exam-01 two=exam-2node-01
+  [[ "${RHCSA_RHEL:-9}" == 10 ]] && { one=exam-r10-01; two=exam-r10-2node-01; }
   cat <<EOF
 ${C_BOLD}rhcsa-sim${C_OFF} — practice the RHCSA EX200 exam on this machine
 
-${C_BOLD}${C_YEL}QUICK START${C_OFF}
+${C_BOLD}${C_YEL}QUICK START${C_OFF}  ${C_DIM}(full walkthrough: README.md)${C_OFF}
   sudo rhcsa-sim doctor                  is everything ready?
-  sudo rhcsa-sim start exam-2node-01    take a full two-node exam (run on node1)
+  sudo rhcsa-sim start $(printf '%-17s' "$one") take a single-node exam
+  sudo rhcsa-sim start $(printf '%-17s' "$two") take a two-node exam (paired VMs; run on node1)
   sudo rhcsa-sim tui                     open the exam paper + timer
   sudo rhcsa-sim grade --reboot          grade like the real exam (reboot + persistence)
-  sudo rhcsa-sim reset                   wipe all practice changes on BOTH nodes
+  sudo rhcsa-sim reset                   wipe all practice changes (both nodes when paired)
 
 ${C_BOLD}TAKE AN EXAM${C_OFF}
   start EXAM|random [--exam|--practice]          (papers: rhcsa-sim list)
@@ -60,10 +64,10 @@ ${C_BOLD}YOUR PROGRESS${C_OFF}
 ${C_BOLD}SETUP (once)${C_OFF}
   node-setup --role node1 --peer IP     pair the two VMs (run on both; see README)
   local-repo               use the attached RHEL DVD as the offline package source
-  list                     all exams and all 215 tasks
+  list                     all exams and tasks for this release
 
-  ${C_DIM}categories: containers deploy filesystems network operate scripting security
-              storage tools users        N = task number shown in the paper
+  ${C_DIM}categories: $(available_categories)
+  N = task number shown in the paper
   In the practice TUI:  h hint · s solution · c check · p check ALL · m mark · q quit
   Run as root on DISPOSABLE VMs · ${DURATION_DEFAULT}s per exam · pass = ${PASS_PCT}% (210/300)${C_OFF}
 EOF
@@ -346,7 +350,7 @@ cmd_start() {
   # A two-node paper needs two paired VMs; without node-setup it would fall through
   # to the single-node reader and report a confusing "unknown exam".
   if is_node_exam "$sel" && [[ -z "$role" ]] && ! node_configured; then
-    die "'$sel' is a two-node exam — pair two VMs first ('rhcsa-sim node-setup', see SETUP.md), or pick a single-node paper from 'rhcsa-sim list'."
+    die "'$sel' is a two-node exam — pair two VMs first ('rhcsa-sim node-setup'; see README.md, '4. Two-node exam'), or pick a single-node paper from 'rhcsa-sim list'."
   fi
   # Refuse a paper written for the other RHCSA version rather than seeding it:
   # its tasks would be filtered out by release, so the candidate would work
@@ -587,7 +591,9 @@ cmd_grade() {
   if _is_controller_session && [[ "${NODE_ROLE:-}" == node1 && -z "${RHCSA_LOCAL_GRADE:-}" ]]; then controller=1; fi
   if (( controller && reboot )); then
     info "Two-node grade: triggering node2 reboot-grade over SSH, then rebooting node1 ..."
-    _peer_ssh "rhcsa-sim grade --reboot" >/dev/null 2>&1 \
+    # node2 reboots mid-command, so ssh exits 255 even on success; judge by
+    # whether node2 got as far as announcing the reboot.
+    _peer_ssh "rhcsa-sim grade --reboot" </dev/null 2>&1 | grep -q "Rebooting now" \
       || warn "could not trigger node2 reboot-grade over SSH (grade node2 manually after it boots)."
     # fall through to arm node1's own post-reboot grading and reboot
   fi

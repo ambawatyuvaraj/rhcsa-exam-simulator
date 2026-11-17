@@ -768,7 +768,9 @@ def main():
             except Exception:
                 pass
     else:
-        print("  (No graphical display detected — open the URL above in node1's browser.)\n")
+        print("  (No graphical display here. Open the URL in this VM's desktop browser, or from")
+        print("   your own computer tunnel it first:  ssh -L %d:localhost:%d <you>@<this-vm-ip>)\n"
+              % (ARGS.port, ARGS.port))
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

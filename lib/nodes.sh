@@ -82,7 +82,13 @@ EOF
   ensure_rhcsactl
 
   echo "node-setup: this host is $role.example.com ($self_ip); peer $peer_role.example.com=$peer_ip"
-  echo "  /etc/hosts updated; node.conf written. Now: rhcsa-sim start --role $role <two-node-exam>"
+  echo "  /etc/hosts updated; node.conf written."
+  if [[ "$role" == node1 ]]; then
+    echo "  Next: run 'rhcsa-sim node-setup --role node2 --peer $self_ip' on node2 (if not done),"
+    echo "        then 'rhcsa-sim doctor' here. Start two-node exams HERE: rhcsa-sim start <two-node-exam>"
+  else
+    echo "  Next: 'rhcsa-sim doctor'. Exams are started and graded from node1 — nothing else to run here."
+  fi
 }
 
 # Controller service account. The two-node controller drives the peer over SSH

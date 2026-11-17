@@ -57,7 +57,7 @@ fi
 
 # ---- Dependencies ----------------------------------------------------------
 DEPS=(python3 podman lvm2 nfs-utils autofs chrony httpd tuned acl \
-      policycoreutils-python-utils firewalld createrepo_c util-linux parted \
+      policycoreutils-python-utils firewalld createrepo_c util-linux parted dosfstools \
       firefox xdg-utils)   # firefox + xdg-open: the browser exam view ('rhcsa-sim tui')
 # Make dnf fail FAST on slow/unreachable mirrors BEFORE installing deps, so a bad
 # default repo can't stall the install before the code is even deployed. Idempotent.
