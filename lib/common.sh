@@ -229,14 +229,16 @@ _node_of_task() {
 compose_two_node() {
   local role="$1" target="${RHCSA_EXAM_SIZE:-15}" t d sd
   sd="$(spare_disk_tasks)"; _is_spare() { grep -qx "$1" <<<"$sd"; }
-  declare -A pick chosen
+  declare -A pick chosen grpused
+  local grp
   while read -r t; do
     [[ -z "$t" ]] && continue
     [[ "$(_node_of_task "$t")" == "$role" ]] || continue
     load_meta "$t"; d="$TASK_DOMAIN"
     [[ -n "${pick[$d]:-}" ]] && continue
     [[ "$d" != storage ]] && _is_spare "$t" && continue
-    pick[$d]="$t"; chosen[$t]=1
+    grp="$(_task_conflict_group "$t")"; [[ -n "$grp" && -n "${grpused[$grp]:-}" ]] && continue
+    pick[$d]="$t"; chosen[$t]=1; [[ -n "$grp" ]] && grpused[$grp]=1
   done < <(single_node_tasks | shuf)
   local out=(); for d in "${!pick[@]}"; do out+=("${pick[$d]}"); done
   while read -r t; do
@@ -245,7 +247,8 @@ compose_two_node() {
     [[ "$(_node_of_task "$t")" == "$role" ]] || continue
     [[ -n "${chosen[$t]:-}" ]] && continue
     _is_spare "$t" && continue
-    out+=("$t"); chosen[$t]=1
+    grp="$(_task_conflict_group "$t")"; [[ -n "$grp" && -n "${grpused[$grp]:-}" ]] && continue
+    out+=("$t"); chosen[$t]=1; [[ -n "$grp" ]] && grpused[$grp]=1
   done < <(single_node_tasks | shuf)
   printf '%s\n' "${out[@]}" | shuf
 }
@@ -349,23 +352,35 @@ category_available() { [[ " $(available_categories) " == *" $1 "* ]]; }
 # category-practice composer picks AT MOST ONE task from each group so every
 # seeded task grades correctly. (Full exams pick ~2/domain, so they rarely
 # co-occur; this matters mainly for dense single-topic practice.)
+#
+# The exam-paper variants (e1-users, e2-users, f08-users, ...) are the same
+# question re-cut for one paper, so every variant sharing a stem is one family
+# automatically. Entries below name those families by STEM ("users" = every
+# e<N>-users / f08-users) alongside plain task ids.
 RHCSA_CONFLICT_GROUPS=(
-  "grep-string head-tail-range script-while-read"                                    # share /root/lines.txt
+  "grep grepcomment grep-string head-tail-range script-while-read"                   # share /root/lines.txt, /root/list
   "boot-target default-target-graphical"                                             # opposite default target
   "service-enable service-disable service-restart service-mask enable-service-boot"  # same atd/rsyncd service
   "tuning-profile tuned-specific"                                                     # the one active tuned profile
-  "sudo-nopasswd sudo-group-passwd sudo-defaults"                                     # %sysmgrs sudoers rule
-  "collaborative-dir users-groups"                                                    # the sysmgrs group definition
+  "sudo sudo-nopasswd sudo-group-passwd sudo-defaults"                                # %sysmgrs sudoers rule
+  "users users-groups collab collaborative-dir findowner find-files"                 # harry/natasha/sarah with different passwords and groups; findowner seeds sarah's files that a users setup would orphan
   "journal-vacuum journal-grep journal-find journal-priority"                         # vacuum deletes entries the reads need
   "selinux-mode selinux-permissive selinux-disabled"                                  # opposite global SELinux state
   "scp-pull secure-copy rsync-dir"                                                    # copy into overlapping /root targets
-  "f08-lvcreate f08-lvresize"                                                          # both define VG 'wgroup' (exam splits them across nodes)
-  "lvm-create e2-lvm"                                                                  # both CREATE VG 'myvg' / LV 'mylv' at /mnt/mydata
-  "lvm-resize e2-lvresize"                                                             # both seed an LV 'vo' at /mnt/vo (would clobber the mount)
+  "lvm lvcreate lvresize lvm-create lvm-resize"                                       # VGs datastore/wgroup/myvg and LV vo, created by one task and seeded by another
+  "cron cron-job"                                                                     # same user's crontab / the same logger job
+  "uid user-uid"                                                                      # user manalo
+  "repo repo2 repo-config"                                                            # the one /opt/rhcsa-repo
+  "backup tar"                                                                        # /root/test.tar.gz
+  "acl acl-permissions"                                                               # /var/tmp/fstab
+  "autofs autofs-nfs"                                                                 # /rhome/remoteuser1
+  "cservice container-service"                                                        # container-ascii2pdf, /opt/incoming
 )
 _task_conflict_group() {
-  local t="$1" g
-  for g in "${RHCSA_CONFLICT_GROUPS[@]}"; do [[ " $g " == *" $t "* ]] && { printf '%s' "$g"; return; }; done
+  local t="$1" s="$1" g
+  [[ "$t" =~ ^(e[0-9]+|f08)-(.+)$ ]] && s="${BASH_REMATCH[2]}"   # variant -> its stem
+  for g in "${RHCSA_CONFLICT_GROUPS[@]}"; do [[ " $g " == *" $s "* ]] && { printf '%s' "$g"; return; }; done
+  [[ "$s" != "$t" ]] && printf 'family:%s' "$s"
 }
 
 # ---- Offline package source (real-exam style: a local install-DVD repo) -----

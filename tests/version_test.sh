@@ -87,6 +87,31 @@ bad=""; for f in "$REPO"/exams/*.list; do
 done
 ck "every exam paper's task ids resolve" "$(printf '%s' "$bad" | head -c 40)" ""
 
+# Practice/random composers pick one task per conflict group. Copies of the same
+# question (identical prompt.txt) must share a group, or practice repeats it (#10).
+grp(){ RHCSA_HOME="$REPO" bash -c '. "$RHCSA_HOME/lib/common.sh" 2>/dev/null; _task_conflict_group "$1"' _ "$1"; }
+ck "e1-users / f08-users / users-groups share a group" \
+   "$(for t in e1-users f08-users users-groups; do grp $t; echo; done | sort -u | wc -l)" "1"
+bad=""; while read -r a b; do [[ "$(grp "$a")" == "$(grp "$b")" && -n "$(grp "$a")" ]] || bad="$bad $a/$b"; done < <(
+  cd "$REPO/tasks" && md5sum */prompt.txt | sort | awk '{ if ($1==h) print p, substr($2,1,index($2,"/")-1); h=$1; p=substr($2,1,index($2,"/")-1) }')
+ck "identical prompts are in one conflict group" "$(printf '%s' "$bad" | head -c 60)" ""
+
+# A lab VM has ONE spare disk, so a paper may claim at most one distinct disk per node.
+bad="$(RHCSA_HOME="$REPO" bash -c '. "$RHCSA_HOME/lib/common.sh" 2>/dev/null
+  for f in "$RHCSA_HOME"/exams/*.list; do
+    sed "s/#.*//" "$f" | awk "NF{ print (\$1==\"node1\"||\$1==\"node2\") ? \$1\" \"\$2 : \"node1 \"\$1 }" |
+    while read -r n id; do k="$(_disk_key "$id")"; [[ -n "$k" ]] && echo "$n $k"; done | sort -u |
+    awk -v f="$(basename "$f")" "{c[\$1]++} END{for (n in c) if (c[n]>1) printf \" %s:%s\", f, n}"
+  done')"
+ck "no paper needs two spare disks on one node" "$bad" ""
+
+# grep-regex and head-tail-range both may draw /root/lines.txt; one session must not.
+bad="$(RHCSA_LIB="$REPO/lib" RHCSA_STATE="$T/pstate" bash -c '. "$RHCSA_LIB/params.sh"
+  for i in $(seq 40); do RHCSA_PARAMS_DIR="$RHCSA_STATE/$i"
+    for t in grep-regex head-tail-range grep-context; do gen_task_params $t "'"$REPO"'/tasks/$t"; done
+    cut -d= -f2 "$RHCSA_PARAMS_DIR"/*.env | sort | uniq -d | grep -E "\.txt$"; done | head -1')"
+ck "session params never share an output file" "$bad" ""
+
 echo
 if [[ $fails -eq 0 ]]; then echo "version_test: ALL PASS"; else echo "version_test: $fails FAILURE(S)"; fi
 exit $(( fails > 0 ))
