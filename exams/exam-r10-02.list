@@ -1,6 +1,6 @@
 # RHCSA_RHEL: 10
 # RHCSA 10 (EX200 on RHEL 10) — single-node exam set 02.
-# Partitioning is GPT-only on RHEL 10 (partition-create uses a GPT label).
+# Partitioning is GPT-only on RHEL 10 (swap-partition uses a GPT label).
 network-config
 repo-add
 flatpak-install
@@ -13,7 +13,7 @@ tar-archive
 script-finder
 acl-permissions
 systemd-timer
-partition-create
+diagnose-perms
 swap-partition
 boot-target
 root-password

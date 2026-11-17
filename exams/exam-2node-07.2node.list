@@ -9,7 +9,7 @@ node1 ssh-key-target
 node1 service-mask
 node1 container-exec
 node1 grub-kernelarg
-node1 lvm-extend
+node1 acl-default
 node1 network-gateway
 node1 secure-copy
 node1 script-arith
@@ -28,7 +28,7 @@ node2 ssh-disable-root
 node2 umask-systemwide
 node2 container-pull
 node2 timedatectl-ntp
-node2 fstab-nofail
+node2 swap-file
 node2 failed-units
 node2 script-case
 node2 selinux-fcontext-equal

@@ -10,7 +10,7 @@ node1 hostname-set
 node1 firewall-zone
 node1 container-logs
 node1 at-job
-node1 label-mount
+node1 tmpfs-mount
 node1 network-secondary-ip
 node1 list-timers
 node1 script-sumloop
